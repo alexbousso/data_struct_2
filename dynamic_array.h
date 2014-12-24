@@ -1,5 +1,5 @@
 /*
- * DynamicArray.h
+ * dynamic_array.h
  *
  *  Created on: Dec 24, 2014
  *      Author: alex

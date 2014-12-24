@@ -1,5 +1,5 @@
 /*
- * AvlTree.h
+ * avl_tree.h
  *
  *  Created on: Nov 15, 2014
  *      Author: Miri

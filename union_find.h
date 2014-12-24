@@ -1,5 +1,5 @@
 /*
- * UnionFind.h
+ * union_find.h
  *
  *  Created on: Dec 24, 2014
  *      Author: alex
