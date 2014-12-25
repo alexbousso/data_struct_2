@@ -180,7 +180,7 @@ void HashTable<T, HashFunction>::reset() {
 template<typename T, typename HashFunction>
 inline void HashTable<T, HashFunction>::checkLoad() {
 	assert(checkHashTable());
-	if (numberOfElements / tableSize > MAXIMUM_LOAD_FACTOR) {
+	if (numberOfElements / tableSize >= MAXIMUM_LOAD_FACTOR) {
 		enlargeTable();
 	} else if (numberOfElements / tableSize < MINIMUM_LOAD_FACTOR) {
 		shrinkTable();

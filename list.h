@@ -223,6 +223,7 @@ void List<T>::remove(typename List<T>::Iterator& it) {
 		it.node->next->previous = it.node->previous;
 	}
 	delete it.node;
+	listSize--;
 }
 
 template<typename T>

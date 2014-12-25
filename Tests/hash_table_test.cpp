@@ -1,6 +1,9 @@
 #include "../hash_table.h"
 #include "assert.h"
 #include <string>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
 
 std::string location;
 
@@ -18,9 +21,32 @@ public:
 };
 
 static void setUp(HashTable<int, Modulo> &hashTable) {
-	for (int i = 0; i <= 100; i++) {
+	for (int i = 0; i <= 10000; i++) {
 		hashTable.insert(i);
 	}
+}
+
+static bool testRandom() {
+	HashTable<int, Modulo> hashTable;
+
+	srand(time(NULL));
+
+	for (int i = 0; i < 100000; i++) {
+		try {
+			switch (rand() % 2) {
+			case 0:
+				hashTable.insert(rand() % 1000);
+				break;
+			case 1:
+				hashTable.remove(rand() % 1000);
+				break;
+			}
+		} catch (DataAlreadyExsists& e) {
+		} catch (DataDoesNotExsist& e) {
+		}
+	}
+
+	return true;
 }
 
 static bool testInsert() {
@@ -38,6 +64,7 @@ static bool testInsert() {
 	ASSERT_NO_THROW(hashTable.reset());
 
 	setUp(hashTable);
+	ASSERT_NO_THROW(hashTable.reset());
 
 	return true;
 }
@@ -58,6 +85,7 @@ static bool testRemove() {
 }
 
 int main() {
+	RUN_TEST(testRandom());
 	RUN_TEST(testInsert());
 	RUN_TEST(testRemove());
 
