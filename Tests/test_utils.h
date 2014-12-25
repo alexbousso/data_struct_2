@@ -82,7 +82,7 @@ extern std::string location; // Used for finding the origin of an exception
 #define RUN_TEST(b) do {\
                 try { \
                         std::cerr << #b << ":"; \
-                        if (b()) std::cerr << "OK" << std::endl; \
+                        if (b) std::cerr << "OK" << std::endl; \
                         else std::cerr << "Failed (" << location << ")" << std::endl; \
                 } catch (...) { \
                         std::cerr << "Failed (" << location << ")" << std::endl; \

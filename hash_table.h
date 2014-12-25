@@ -28,9 +28,35 @@ public:
 	~HashTable();
 
 	// TODO: Documentation
+	/**
+	 * Inserts an element in the hash table.
+	 *
+	 * @param data - The element to insert.
+	 * @throws DataAlreadyExsists() - If the element already exists.
+	 */
 	void insert(T data);
+
+	/**
+	 * Removes an existing element from the hash table.
+	 *
+	 * @param data - The element to remove.
+	 * @throws DataDoesNotExsist() - If the given data is not in the table.
+	 */
 	void remove(T data);
+
+	/**
+	 * Returns true if and only if the given element is on the hash table.
+	 * Otherwise, the function returns false.
+	 *
+	 * @param data - The element to check.
+	 */
 	bool find(T data);
+
+	/**
+	 * Resets the hash table as it is after calling the constructor. Every
+	 * information will be deleted after calling this function.
+	 */
+	void reset();
 
 private:
 	/**
@@ -129,6 +155,26 @@ void HashTable<T, HashFunction>::remove(T data) {
 		}
 	}
 	checkLoad();
+}
+
+template<typename T, typename HashFunction>
+bool HashTable<T, HashFunction>::find(T data) {
+	for (typename List<T>::Iterator it(table[index(data)].begin());
+			it != table[index(data)].end(); ++it) {
+		if (data == *it) {
+			return true;
+		}
+	}
+	return false;
+}
+
+template<typename T, typename HashFunction>
+void HashTable<T, HashFunction>::reset() {
+	delete[] table;
+	numberOfElements = 0;
+	tableSize = INITIAL_TABLE_SIZE;
+	index = HashFunction(INITIAL_TABLE_SIZE);
+	table = new List<T> [INITIAL_TABLE_SIZE];
 }
 
 template<typename T, typename HashFunction>
