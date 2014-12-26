@@ -134,7 +134,7 @@ template<typename T>
 inline List<T>::List(List& copy) :
 		first(new List<T>::Node), last(first), listSize(0) {
 	for (List<T>::Iterator it = copy.begin(); it != copy.end(); ++it) {
-		pushBack(*it);
+		this->pushBack(*it);
 	}
 }
 
@@ -213,11 +213,13 @@ void List<T>::pushFront(const T& data) {
 
 template<typename T>
 void List<T>::remove(typename List<T>::Iterator& it) {
+	if (it == end()) {
+		throw InvalidIterator();
+	}
+
 	if (it == begin()) {
 		first = it.node->next;
-		first->next->previous = NULL;
-	} else if (it == end()) {
-		throw InvalidIterator();
+		first->previous = NULL;
 	} else {
 		it.node->previous->next = it.node->next;
 		it.node->next->previous = it.node->previous;

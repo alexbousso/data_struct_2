@@ -16,7 +16,7 @@ public:
 	}
 
 	int operator()(int num) {
-		return num % n;
+		return abs(num % n);
 	}
 };
 
@@ -84,10 +84,60 @@ static bool testRemove() {
 	return true;
 }
 
+static bool testFind() {
+	HashTable<int, Modulo> hashTable;
+
+	ASSERT_FALSE(hashTable.find(42));
+	ASSERT_NO_THROW(hashTable.insert(42));
+	ASSERT_TRUE(hashTable.find(42));
+	ASSERT_FALSE(hashTable.find(11));
+	ASSERT_NO_THROW(hashTable.remove(42));
+	ASSERT_FALSE(hashTable.find(42));
+
+	setUp(hashTable);
+
+	ASSERT_FALSE(hashTable.find(-2));
+	ASSERT_TRUE(hashTable.find(55));
+
+	return true;
+}
+
 int main() {
 	RUN_TEST(testRandom());
 	RUN_TEST(testInsert());
 	RUN_TEST(testRemove());
+	RUN_TEST(testFind());
+
+	std::cout << std::endl;
+	std::cout << "Printing a random list:" << std::endl;
+	std::cout << std::endl;
+
+	HashTable<int, Modulo> hashTable;
+	srand(time(NULL));
+
+	for (int i = 0; i < 2000; i++) {
+		try {
+			switch (rand() % 2) {
+			case 0:
+				hashTable.insert(rand() % 1000);
+				break;
+			case 1:
+				hashTable.remove(rand() % 1000);
+				break;
+			}
+		} catch (DataAlreadyExsists& e) {
+		} catch (DataDoesNotExsist& e) {
+		}
+	}
+
+	for (int i = 0; i < 2000; i++) {
+		try {
+			hashTable.remove(rand() % 950);
+		} catch (DataDoesNotExsist& e) {
+		}
+	}
+
+	hashTable.print();
 
 	return 0;
 }

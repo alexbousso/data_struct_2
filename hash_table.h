@@ -11,6 +11,7 @@
 #include "list.h"
 #include "exceptions.h"
 #include <cassert>
+#include <iostream>
 
 /**
  * TODO: Explain in a better way.
@@ -27,7 +28,6 @@ public:
 	HashTable();
 	~HashTable();
 
-	// TODO: Documentation
 	/**
 	 * Inserts an element in the hash table.
 	 *
@@ -57,6 +57,13 @@ public:
 	 * information will be deleted after calling this function.
 	 */
 	void reset();
+
+	/**
+	 * Prints the hash table.
+	 *
+	 * @param os - The output stream function (default is std::cout).
+	 */
+	void print(std::ostream& os = std::cout);
 
 private:
 	/**
@@ -107,9 +114,24 @@ private:
 	 */
 	void checkLoad();
 
-	// TODO: Documentation
+	/**
+	 * Creates a new hash table with the size
+	 * 		tableSize * MULTIPLY_FACTOR
+	 */
 	void enlargeTable();
+
+	/**
+	 * Rearranges and shrinks the table to the size
+	 * 		tableSize / MULTIPLY_FACTOR
+	 */
 	void shrinkTable();
+
+	/**
+	 * Copies every element from a table to another.
+	 *
+	 * @param copy - A pointer whom the table is copied to.
+	 * @param size - The size of the new table.
+	 */
 	void copyTableTo(List<T>*, int size) const;
 
 	/**
@@ -175,6 +197,24 @@ void HashTable<T, HashFunction>::reset() {
 	tableSize = INITIAL_TABLE_SIZE;
 	index = HashFunction(INITIAL_TABLE_SIZE);
 	table = new List<T> [INITIAL_TABLE_SIZE];
+}
+
+template<typename T, typename HashFunction>
+void HashTable<T, HashFunction>::print(std::ostream& os) {
+	os << "List number: | List elements:" << std::endl;
+	for (int i = 0; i < tableSize; i++) {
+		os << ' ';
+		os.width(10);
+		os << i << "  |  ";
+		for (typename List<T>::Iterator it(table[i].begin());
+				it != table[i].end(); ++it) {
+			if (it != table[i].begin()) {
+				os << " -> ";
+			}
+			os << *it;
+		}
+		os << std::endl;
+	}
 }
 
 template<typename T, typename HashFunction>
