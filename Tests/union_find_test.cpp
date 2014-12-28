@@ -18,6 +18,15 @@ public:
 		return a - b;
 	}
 };
+
+class IncreaseInt {
+	int x;
+public:
+	IncreaseInt(int x) : x(x) {};
+	void operator ()(int& y){
+		y += x;
+	}
+};
 /*
 class Intiger{
 	int id;
@@ -103,10 +112,50 @@ static bool testUnionFindUnite(){
 	return true;
 }
 
+static bool testUnionFindUpdateElement(){
+
+	UnionFind <int, CompareInt> uf(10);
+//	ASSERT_NO_THROW(uf.printUF());
+
+	ASSERT_NO_THROW(uf.unite(4, 9));
+	ASSERT_EQUALS(4, uf.getParent(9));
+	ASSERT_EQUALS(9, uf.getMaxIndex(4));
+	ASSERT_EQUALS(9, uf.getMaxIndex(9));
+
+	ASSERT_NO_THROW(uf.unite(7, 8));
+	ASSERT_EQUALS(8, uf.getMaxIndex(7));
+	ASSERT_NO_THROW(uf.unite(6, 1));
+	ASSERT_EQUALS(6, uf.getMaxIndex(1));
+	//uf.printUF();
+	ASSERT_NO_THROW(uf.unite(7, 6));
+	//cout << "after unite: \n";
+	//uf.printUF();
+	ASSERT_EQUALS(8, uf.getMaxIndex(1));
+	ASSERT_EQUALS(8, uf.getMaxIndex(6));
+	ASSERT_EQUALS(-1, uf.getGroupSize(6));
+	ASSERT_EQUALS(7, uf.getParent(6));
+	ASSERT_EQUALS(4, uf.getGroupSize(7));
+
+	ASSERT_NO_THROW(uf.updateElement(1, IncreaseInt(20)));
+	ASSERT_EQUALS(1, uf.getMaxIndex(7));
+
+	ASSERT_NO_THROW(uf.unite(4, 7));
+	ASSERT_EQUALS(7, uf.getParent(4));
+	ASSERT_EQUALS(6, uf.getGroupSize(7));
+
+	ASSERT_NO_THROW(uf.updateElement(9, IncreaseInt(30)));
+	ASSERT_EQUALS(39, uf.getData(9));
+	ASSERT_EQUALS(9, uf.getMaxIndex(7));
+	ASSERT_EQUALS(9, uf.getMaxIndex(1));
+
+	return true;
+}
+
 int main(){
 
 	RUN_TEST(testUnionFindFind());
 	RUN_TEST(testUnionFindUnite());
+	RUN_TEST(testUnionFindUpdateElement());
 
 	return 0;
 }

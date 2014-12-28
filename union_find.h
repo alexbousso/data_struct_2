@@ -27,15 +27,19 @@ class UnionFind {
 	UnionFind(const UnionFind&);
 	UnionFind& operator=(const UnionFind&);
 
+	//returns a reference to the data of the i node
+	T& getDataForChange(int i);
+
 public:
 	UnionFind(int size);
-	~UnionFind() {
-	} //TODO implement!!
+	~UnionFind();
 
 	//return the index of the group containing i
 	int find(int i);
 
-	//gets 2 groups (!!! roots!!!) and unites them by size, if the input aren't groups-InvalidInput is thrown
+	/*gets 2 groups (!!! roots!!!) and unites them by size,
+	 * if the input aren't groups-InvalidInput is thrown
+	 */
 	void unite(int, int);
 
 	//int getRoot(int); TODO check if this is relevant now that we know that the find does that!
@@ -44,15 +48,24 @@ public:
 	int getMaxIndex(int);
 
 	//returns the data of the node in index i
-	const T& getData(int i);
+	const T& getData(int i) const;
 
 	//returns the index of the node who's the parent of the i node.
-	int getParent(int i);
+	int getParent(int i) const;
 
-	//returns the size of the tree who's root is the i node. (assuming it gets only roots!!!! cuz otherwise, -1 is returned)
-	int getGroupSize(int i);
+	/*returns the size of the tree who's root is the i node.
+	 * (assuming it gets only roots!!!! cuz otherwise, -1 is returned)
+	 */
+	int getGroupSize(int i) const;
 
-	void printUF();
+	/*updates element i.
+	 * Func is a fanctor that gets T& and modifies the data.
+	 * Func should have operator ()
+	 */
+	template <typename Func>
+	void updateElement(int i, Func func);
+
+	void printUF() const;
 };
 
 /*every node starts like this: the node is it's own max, every node is of size 1
@@ -77,26 +90,34 @@ public:
 	}
 };
 
-/**************************************************
+/**********************************************************
  * FUNCTIONS IMPLEMENTATION
- **************************************************/
+ **********************************************************/
+
+
 //TODO remove the part with the int!!!!!
 template<typename T, typename Compare>
 UnionFind<T, Compare>::UnionFind(int size) :
 		ufSize(size), route() {
 	tree = new Node[size];
+
 	if (typeid(T) == typeid(size)) {
 		//cout << "it's int\n";
 		for (int i = 0; i < size; i++) {
 			tree[i].data = i;
 		}
 	}
+
 	for (int i = 0; i < size; i++) {
 		tree[i].max = i;
 	}
 
 }
 
+template<typename T, typename Compare>
+UnionFind<T, Compare>::~UnionFind(){
+	delete[] tree;
+}
 template<typename T, typename Compare>
 int UnionFind<T, Compare>::find(int i) {
 
@@ -126,7 +147,7 @@ int UnionFind<T, Compare>::find(int i) {
 }
 
 template<typename T, typename Compare>
-void UnionFind<T, Compare>::printUF() {
+void UnionFind<T, Compare>::printUF() const {
 	cout << "\n";
 	for (int i = 0; i < ufSize; i++) {
 		cout << "index: " << i << " | data: " << tree[i].data << " | max: "
@@ -166,7 +187,7 @@ void UnionFind<T, Compare>::unite(int group1, int group2) {
 }
 
 template<typename T, typename Compare>
-int UnionFind<T, Compare>::getParent(int index) {
+int UnionFind<T, Compare>::getParent(int index) const{
 	if (index < 0 || index > ufSize - 1) {
 		throw DataDoesNotExist();
 	}
@@ -175,7 +196,7 @@ int UnionFind<T, Compare>::getParent(int index) {
 }
 
 template<typename T, typename Compare>
-int UnionFind<T, Compare>::getGroupSize(int index) {
+int UnionFind<T, Compare>::getGroupSize(int index) const {
 	if (index < 0 || index > ufSize - 1) {
 		throw DataDoesNotExist();
 	}
@@ -190,7 +211,31 @@ int UnionFind<T, Compare>::getMaxIndex(int index) {
 	}
 	int rootIndex = find(index);
 	return tree[rootIndex].max;
-
 }
 
+template<typename T, typename Compare>
+template <typename Func>
+void UnionFind <T, Compare>::updateElement(int i, Func func){
+	if (i < 0 || i >= ufSize){
+		throw DataDoesNotExist();
+	}
+	func(getDataForChange(i));
+	int root = find(i);
+	if (compare(tree[root].max, tree[i].data) < 0){	//if the i element is larger then the max
+		tree[root].max = i;	//let the max be i
+	}
+}
+
+template<typename T, typename Compare>
+T& UnionFind <T, Compare>::getDataForChange(int i){
+	if (i < 0 || i >= ufSize){
+		throw DataDoesNotExist();
+	}
+	return tree[i].data;
+}
+
+template<typename T, typename Compare>
+const T& UnionFind <T, Compare>::getData(int i) const{
+	return tree[i].data;
+}
 #endif /* UNIONFIND_H_ */
