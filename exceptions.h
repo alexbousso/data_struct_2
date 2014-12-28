@@ -22,7 +22,11 @@ class IndexOutOfBounds: public std::exception {
 
 class InvalidIterator: public std::exception {
 };
-class InvalidInput: std::exception {
+
+class InvalidInput: public std::exception {
+};
+
+class CityIsEmpty: public std::exception {
 };
 
 #endif /* EXCEPTIONS_H_ */

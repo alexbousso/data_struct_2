@@ -32,7 +32,7 @@ public:
 	 * Inserts an element in the hash table.
 	 *
 	 * @param data - The element to insert.
-	 * @throws DataAlreadyExsists() - If the element already exists.
+	 * @throws DataAlreadyExists() - If the element already exists.
 	 */
 	void insert(T data);
 
@@ -40,7 +40,7 @@ public:
 	 * Removes an existing element from the hash table.
 	 *
 	 * @param data - The element to remove.
-	 * @throws DataDoesNotExsist() - If the given data is not in the table.
+	 * @throws DataDoesNotExist() - If the given data is not in the table.
 	 */
 	void remove(T data);
 
@@ -155,7 +155,7 @@ inline HashTable<T, HashFunction>::~HashTable() {
 template<typename T, typename HashFunction>
 inline void HashTable<T, HashFunction>::insert(T data) {
 	if (find(data)) {
-		throw DataAlreadyExsists();
+		throw DataAlreadyExists();
 	}
 	table[index(data)].pushFront(data);
 	numberOfElements++;
@@ -165,7 +165,7 @@ inline void HashTable<T, HashFunction>::insert(T data) {
 template<typename T, typename HashFunction>
 void HashTable<T, HashFunction>::remove(T data) {
 	if (!find(data)) {
-		throw DataDoesNotExsist();
+		throw DataDoesNotExist();
 	}
 	assert(numberOfElements > 0);
 	for (typename List<T>::Iterator it(table[index(data)].begin());
@@ -225,12 +225,12 @@ inline void HashTable<T, HashFunction>::checkLoad() {
 	} else if (numberOfElements / tableSize < MINIMUM_LOAD_FACTOR) {
 		shrinkTable();
 	}
-	index = HashFunction(tableSize);
 }
 
 template<typename T, typename HashFunction>
 void HashTable<T, HashFunction>::enlargeTable() {
 	List<T> *newTable(new List<T> [tableSize * MULTIPLY_FACTOR]);
+	index = HashFunction(tableSize * MULTIPLY_FACTOR);
 	copyTableTo(newTable, tableSize * MULTIPLY_FACTOR);
 	tableSize *= MULTIPLY_FACTOR;
 	delete[] table;
@@ -241,6 +241,7 @@ template<typename T, typename HashFunction>
 void HashTable<T, HashFunction>::shrinkTable() {
 	if (tableSize > INITIAL_TABLE_SIZE) {
 		List<T> *newTable(new List<T> [tableSize / MULTIPLY_FACTOR]);
+		index = HashFunction(tableSize / MULTIPLY_FACTOR);
 		copyTableTo(newTable, tableSize / MULTIPLY_FACTOR);
 		tableSize /= MULTIPLY_FACTOR;
 		delete[] table;
@@ -254,7 +255,7 @@ inline void HashTable<T, HashFunction>::copyTableTo(List<T> *copy,
 	for (int i = 0; i < tableSize; i++) {
 		for (typename List<T>::Iterator it(table[i].begin());
 				it != table[i].end(); ++it) {
-			copy[*it % size].pushFront(*it);
+			copy[index(*it)].pushFront(*it);
 		}
 	}
 }

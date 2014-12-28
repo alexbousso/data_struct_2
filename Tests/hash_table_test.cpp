@@ -35,14 +35,14 @@ static bool testRandom() {
 		try {
 			switch (rand() % 2) {
 			case 0:
-				hashTable.insert(rand() % 1000);
+				hashTable.insert(rand() % 1000 - 500);
 				break;
 			case 1:
-				hashTable.remove(rand() % 1000);
+				hashTable.remove(rand() % 1000 - 500);
 				break;
 			}
-		} catch (DataAlreadyExsists& e) {
-		} catch (DataDoesNotExsist& e) {
+		} catch (DataAlreadyExists& e) {
+		} catch (DataDoesNotExist& e) {
 		}
 	}
 
@@ -119,21 +119,21 @@ int main() {
 		try {
 			switch (rand() % 2) {
 			case 0:
-				hashTable.insert(rand() % 1000);
+				hashTable.insert(rand() % 1000 - 500);
 				break;
 			case 1:
-				hashTable.remove(rand() % 1000);
+				hashTable.remove(rand() % 1000 - 500);
 				break;
 			}
-		} catch (DataAlreadyExsists& e) {
-		} catch (DataDoesNotExsist& e) {
+		} catch (DataAlreadyExists& e) {
+		} catch (DataDoesNotExist& e) {
 		}
 	}
 
 	for (int i = 0; i < 2000; i++) {
 		try {
-			hashTable.remove(rand() % 950);
-		} catch (DataDoesNotExsist& e) {
+			hashTable.remove(rand() % 920 - 480);
+		} catch (DataDoesNotExist& e) {
 		}
 	}
 
