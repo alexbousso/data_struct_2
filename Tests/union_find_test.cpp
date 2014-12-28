@@ -58,7 +58,7 @@ static bool testUnionFindFind(){
 	ASSERT_NO_THROW(uf.unite(2, 9));
 	ASSERT_EQUALS(9, uf.getParent(2));
 
-	ASSERT_NO_THROW(uf.unite(9, 4));
+	ASSERT_NO_THROW(uf.unite(9, 5));
 	ASSERT_NO_THROW(uf.find(1));
 	ASSERT_EQUALS(9, uf.getParent(5));
 	ASSERT_EQUALS(9, uf.getParent(4));
@@ -84,11 +84,12 @@ static bool testUnionFindUnite(){
 	ASSERT_EQUALS(5, uf.getMaxIndex(4));
 	ASSERT_EQUALS(5, uf.getMaxIndex(5));
 
-	ASSERT_THROWS(InvalidInput, uf.unite(5, 1));	//5 isn't a root
+	ASSERT_THROWS(InvalidInput, uf.unite(4, 1));	//4 isn't the max of it's tree
+	ASSERT_THROWS(InvalidInput, uf.unite(1, 2));	//2 isn't the max of it's tree
 	ASSERT_THROWS(InvalidInput, uf.unite(10, 1));	//10>7=size
 	ASSERT_THROWS(InvalidInput, uf.unite(1, 9));	//9>7=size
 
-	ASSERT_NO_THROW(uf.unite(4, 1));
+	ASSERT_NO_THROW(uf.unite(5, 1));
 	ASSERT_EQUALS(5, uf.getMaxIndex(1));
 	ASSERT_EQUALS(5, uf.getMaxIndex(4));
 	ASSERT_EQUALS(5, uf.getMaxIndex(5));
@@ -97,7 +98,7 @@ static bool testUnionFindUnite(){
 	ASSERT_EQUALS(3, uf.getGroupSize(4));
 	ASSERT_EQUALS(-1, uf.getParent(4));
 
-	ASSERT_NO_THROW(uf.unite(2, 4));
+	ASSERT_NO_THROW(uf.unite(3, 5));
 	ASSERT_EQUALS(4, uf.getParent(2));
 	//cout << "\n wanted print: \n";
 	ASSERT_EQUALS(4, uf.find(3));
@@ -127,9 +128,9 @@ static bool testUnionFindUpdateElement(){
 	ASSERT_NO_THROW(uf.unite(6, 1));
 	ASSERT_EQUALS(6, uf.getMaxIndex(1));
 	//uf.printUF();
-	ASSERT_NO_THROW(uf.unite(7, 6));
+	ASSERT_NO_THROW(uf.unite(8, 6));
 	//cout << "after unite: \n";
-	//uf.printUF();
+	uf.printUF();
 	ASSERT_EQUALS(8, uf.getMaxIndex(1));
 	ASSERT_EQUALS(8, uf.getMaxIndex(6));
 	ASSERT_EQUALS(-1, uf.getGroupSize(6));
@@ -139,7 +140,7 @@ static bool testUnionFindUpdateElement(){
 	ASSERT_NO_THROW(uf.updateElement(1, IncreaseInt(20)));
 	ASSERT_EQUALS(1, uf.getMaxIndex(7));
 
-	ASSERT_NO_THROW(uf.unite(4, 7));
+	ASSERT_NO_THROW(uf.unite(9, 21));
 	ASSERT_EQUALS(7, uf.getParent(4));
 	ASSERT_EQUALS(6, uf.getGroupSize(7));
 

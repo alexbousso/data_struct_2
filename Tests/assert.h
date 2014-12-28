@@ -21,9 +21,9 @@
 	ASSERT_THROWS(InvalidIterator, arg)
 
 #define ASSERT_DATA_ALREADY_EXISTS(arg) \
-	ASSERT_THROWS(DataAlreadyExsists, arg)
+	ASSERT_THROWS(DataAlreadyExists, arg)
 
 #define ASSERT_DATA_DOES_NOT_EXIST(arg) \
-	ASSERT_THROWS(DataDoesNotExsist, arg)
+	ASSERT_THROWS(DataDoesNotExist, arg)
 
 #endif /* ASSERT_H_ */

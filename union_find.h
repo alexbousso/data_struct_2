@@ -10,9 +10,7 @@
 
 #include <cassert>
 #include <iostream>
-#include <typeinfo>	//TODO remove this' it's only needed for the tests!!!#include "exceptions.h"#include "list.h"
-using std::cout;
-using std::endl;
+#include <typeinfo>	//TODO remove this' it's only needed for the tests!!!#include "exceptions.h"#include "list.h"using std::cout;using std::endl;
 
 template<typename T, typename Compare>
 class UnionFind {
@@ -62,7 +60,7 @@ public:
 	 * Func is a fanctor that gets T& and modifies the data.
 	 * Func should have operator ()
 	 */
-	template <typename Func>
+	template<typename Func>
 	void updateElement(int i, Func func);
 
 	void printUF() const;
@@ -94,7 +92,6 @@ public:
  * FUNCTIONS IMPLEMENTATION
  **********************************************************/
 
-
 //TODO remove the part with the int!!!!!
 template<typename T, typename Compare>
 UnionFind<T, Compare>::UnionFind(int size) :
@@ -115,7 +112,7 @@ UnionFind<T, Compare>::UnionFind(int size) :
 }
 
 template<typename T, typename Compare>
-UnionFind<T, Compare>::~UnionFind(){
+UnionFind<T, Compare>::~UnionFind() {
 	delete[] tree;
 }
 template<typename T, typename Compare>
@@ -156,38 +153,44 @@ void UnionFind<T, Compare>::printUF() const {
 	}
 }
 
+//TODO fix this!!!
+
 template<typename T, typename Compare>
-void UnionFind<T, Compare>::unite(int group1, int group2) {
-	if (group1 < 0 || group1 > ufSize - 1 || group2 < 0 || group2 > ufSize - 1
-			|| tree[group1].parent != -1 || tree[group2].parent != -1) {
+void UnionFind<T, Compare>::unite(int element1, int element2) {
+	if (element1 < 0 || element1 > ufSize - 1 || element2 < 0
+			|| element2 > ufSize - 1 || tree[find(element1)].max != element1
+			|| tree[find(element2)].max != element2) {
 		throw InvalidInput();
 	}
+
+	int root1 = find(element1), root2 = find(element2);
+/*	if ((tree(root1).max != element1) || (tree(root2).max != element2)) {
+		throw InvalidInput();
+	}*/
 	//the groups are valid, so check which is the largest
-	if (tree[group1].size >= tree[group2].size) { //if the first tree is larger (or equal)
-		tree[group1].size += tree[group2].size; //let the sum of the sizes be the size of the root
-		tree[group1].max =
-				compare(tree[tree[group1].max].data,
-						tree[tree[group2].max].data) > 0 ?
-						tree[group1].max : tree[group2].max;
+	if (tree[root1].size >= tree[root2].size) { //if the first tree is larger (or equal)
+		tree[root1].size += tree[root2].size; //let the sum of the sizes be the size of the root
+		tree[root1].max =
+				compare(tree[tree[root1].max].data, tree[tree[root2].max].data)
+						> 0 ? tree[root1].max : tree[root2].max;
 		//tree[group1].max >= tree[group2].max ?
 		//tree[group1].max : tree[group2].max; //update the max of the united tree
-		tree[group2].parent = group1;	//let the root be the parent
-		tree[group2].size = -1;	//make the inner nodes' size irrelevant
+		tree[root2].parent = root1;	//let the root be the parent
+		tree[root2].size = -1;	//make the inner nodes' size irrelevant
 	} else { //group2 is the larger, so it is the root
-		tree[group2].size += tree[group1].size; //let the sum of the sizes be the size of the root
-		tree[group2].max =
-				compare(tree[tree[group1].max].data,
-						tree[tree[group2].max].data) > 0 ?
-						tree[group1].max : tree[group2].max;
+		tree[root2].size += tree[root1].size; //let the sum of the sizes be the size of the root
+		tree[root2].max =
+				compare(tree[tree[root1].max].data, tree[tree[root2].max].data)
+						> 0 ? tree[root1].max : tree[root2].max;
 		//tree[group1].max >= tree[group2].max ?
 		//	tree[group1].max : tree[group2].max; //update the max of the united tree
-		tree[group1].parent = group2;	//let the root be the parent
-		tree[group1].size = -1;	//make the inner nodes' size irrelevant
+		tree[root1].parent = root2;	//let the root be the parent
+		tree[root1].size = -1;	//make the inner nodes' size irrelevant
 	}
 }
 
 template<typename T, typename Compare>
-int UnionFind<T, Compare>::getParent(int index) const{
+int UnionFind<T, Compare>::getParent(int index) const {
 	if (index < 0 || index > ufSize - 1) {
 		throw DataDoesNotExist();
 	}
@@ -214,28 +217,28 @@ int UnionFind<T, Compare>::getMaxIndex(int index) {
 }
 
 template<typename T, typename Compare>
-template <typename Func>
-void UnionFind <T, Compare>::updateElement(int i, Func func){
-	if (i < 0 || i >= ufSize){
+template<typename Func>
+void UnionFind<T, Compare>::updateElement(int i, Func func) {
+	if (i < 0 || i >= ufSize) {
 		throw DataDoesNotExist();
 	}
 	func(getDataForChange(i));
 	int root = find(i);
-	if (compare(tree[root].max, tree[i].data) < 0){	//if the i element is larger then the max
+	if (compare(tree[root].max, tree[i].data) < 0) {//if the i element is larger then the max
 		tree[root].max = i;	//let the max be i
 	}
 }
 
 template<typename T, typename Compare>
-T& UnionFind <T, Compare>::getDataForChange(int i){
-	if (i < 0 || i >= ufSize){
+T& UnionFind<T, Compare>::getDataForChange(int i) {
+	if (i < 0 || i >= ufSize) {
 		throw DataDoesNotExist();
 	}
 	return tree[i].data;
 }
 
 template<typename T, typename Compare>
-const T& UnionFind <T, Compare>::getData(int i) const{
+const T& UnionFind<T, Compare>::getData(int i) const {
 	return tree[i].data;
 }
 #endif /* UNIONFIND_H_ */
