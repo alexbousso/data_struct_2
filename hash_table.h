@@ -53,6 +53,11 @@ public:
 	bool find(T data);
 
 	/**
+	 * TODO: Documentation
+	 */
+	T& getData(int key);
+
+	/**
 	 * Resets the hash table as it is after calling the constructor. Every
 	 * information will be deleted after calling this function.
 	 */
@@ -188,6 +193,17 @@ bool HashTable<T, HashFunction>::find(T data) {
 		}
 	}
 	return false;
+}
+
+template<typename T, typename HashFunction>
+T& HashTable<T, HashFunction>::getData(int key) {
+	for (typename List<T>::Iterator it(table[index(key)].begin());
+			it != table[index(key)].end(); ++it) {
+		if (key == *it) {
+			return *it;
+		}
+	}
+	throw DataDoesNotExist();
 }
 
 template<typename T, typename HashFunction>

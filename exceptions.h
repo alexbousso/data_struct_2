@@ -32,4 +32,7 @@ class InvalidInput: public std::exception {
 class CityIsEmpty: public std::exception {
 };
 
+class Failure: public std::exception {
+};
+
 #endif /* EXCEPTIONS_H_ */

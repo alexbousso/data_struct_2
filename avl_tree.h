@@ -115,7 +115,7 @@ class AVLTree {
 
 public:
 	AVLTree() :
-			root(NULL), treeSize(0), max(NULL), compare() {
+			root(NULL), treeSize(0), compare(), max(NULL) {
 	}
 	AVLTree(Compare func) :
 			root(NULL), treeSize(0), compare(func), max(NULL) {

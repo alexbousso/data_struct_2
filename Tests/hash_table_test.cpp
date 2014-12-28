@@ -15,7 +15,7 @@ public:
 			n(n) {
 	}
 
-	int operator()(int num) {
+	int operator()(int num) const {
 		return abs(num % n);
 	}
 };

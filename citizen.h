@@ -11,10 +11,13 @@
 #include "exceptions.h"
 
 class Citizen {
-	int ID;
+	const int ID;
 	int livingCity;
 
 public:
+	Citizen() :
+			ID(-1), livingCity(-1) {
+	}
 	Citizen(int ID) :
 			ID(ID), livingCity(-1) {
 		if (ID < 0) {
@@ -36,6 +39,18 @@ public:
 	int getLivingCity() {
 		return livingCity;
 	}
+
+	bool operator==(Citizen other) {
+		return ID == other.ID;
+	}
 };
+
+bool operator==(Citizen citizen, int ID) {
+	return citizen.getID() == ID;
+}
+
+bool operator==(int ID, Citizen citizen) {
+	return citizen.getID() == ID;
+}
 
 #endif /* CITIZEN_H_ */

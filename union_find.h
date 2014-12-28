@@ -98,12 +98,13 @@ UnionFind<T, Compare>::UnionFind(int size) :
 		ufSize(size), route() {
 	tree = new Node[size];
 
-	if (typeid(T) == typeid(size)) {
-		//cout << "it's int\n";
-		for (int i = 0; i < size; i++) {
-			tree[i].data = i;
-		}
-	}
+	// TODO: Remove
+//	if (typeid(T) == typeid(size)) {
+//		//cout << "it's int\n";
+//		for (int i = 0; i < size; i++) {
+//			tree[i].data = i;
+//		}
+//	}
 
 	for (int i = 0; i < size; i++) {
 		tree[i].max = i;
@@ -227,7 +228,7 @@ void UnionFind<T, Compare>::updateElement(int i, Func func) {
 	}
 	func(getDataForChange(i));
 	int root = find(i);
-	if (compare(tree[root].max, tree[i].data) < 0) {//if the i element is larger then the max
+	if (compare(tree[tree[root].max].data, tree[i].data) < 0) {//if the i element is larger then the max
 		tree[root].max = i;	//let the max be i
 	}
 }

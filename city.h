@@ -10,14 +10,26 @@
 
 #include <cassert>
 
+static int CITY_ID_INITIALIZER = 0;
+
 class City {
 	int population;
-	const int cityID;
-	static int CITY_ID_INITIALIZER = 0;
+	int cityID;
 
 public:
 	City() :
 			population(0), cityID(CITY_ID_INITIALIZER++) {
+	}
+
+	City(const City& copy) :
+			population(copy.population), cityID(copy.cityID) {
+	}
+
+	City(int population, int cityID) :
+			population(population), cityID(cityID) {
+		if (population < 0 || cityID < 0) {
+			throw InvalidInput();
+		}
 	}
 
 	void increasePopulation() {
@@ -30,6 +42,10 @@ public:
 		}
 		assert(population > 0);
 		--population;
+	}
+
+	int getPopulation() {
+		return population;
 	}
 
 	int getCityID() {
