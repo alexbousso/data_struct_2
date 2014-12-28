@@ -28,16 +28,6 @@ class AVLTree {
 	class PrintSubTree;
 	class CopyTree;
 
-	//TODO fix this!!!
-/*	class DataDoesNotExist: std::exception {
-	};
-	class InvalidInput: std::exception {
-	};
-	class InputAlreadyExists: std::exception {
-	};
-	class BadTreeElement: std::exception {
-	};
-*/
 	//inserting a new object to the tree under a specific root
 	void insert(AVLNode*, const T&);
 
@@ -125,7 +115,7 @@ class AVLTree {
 
 public:
 	AVLTree() :
-			root(NULL), treeSize(0), max(NULL) {
+			root(NULL), treeSize(0), max(NULL), compare() {
 	}
 	AVLTree(Compare func) :
 			root(NULL), treeSize(0), compare(func), max(NULL) {

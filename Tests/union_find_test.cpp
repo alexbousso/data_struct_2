@@ -130,7 +130,7 @@ static bool testUnionFindUpdateElement(){
 	//uf.printUF();
 	ASSERT_NO_THROW(uf.unite(8, 6));
 	//cout << "after unite: \n";
-	uf.printUF();
+
 	ASSERT_EQUALS(8, uf.getMaxIndex(1));
 	ASSERT_EQUALS(8, uf.getMaxIndex(6));
 	ASSERT_EQUALS(-1, uf.getGroupSize(6));
@@ -140,7 +140,9 @@ static bool testUnionFindUpdateElement(){
 	ASSERT_NO_THROW(uf.updateElement(1, IncreaseInt(20)));
 	ASSERT_EQUALS(1, uf.getMaxIndex(7));
 
-	ASSERT_NO_THROW(uf.unite(9, 21));
+	uf.printUF();
+
+	ASSERT_NO_THROW(uf.unite(9, 1));
 	ASSERT_EQUALS(7, uf.getParent(4));
 	ASSERT_EQUALS(6, uf.getGroupSize(7));
 
