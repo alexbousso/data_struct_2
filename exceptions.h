@@ -8,10 +8,10 @@
 #ifndef EXCEPTIONS_H_
 #define EXCEPTIONS_H_
 
-class DataAlreadyExsists: public std::exception {
+class DataAlreadyExists: public std::exception {
 };
 
-class DataDoesNotExsist: public std::exception {
+class DataDoesNotExist: public std::exception {
 };
 
 class ListIsEmpty: public std::exception {
@@ -21,6 +21,8 @@ class IndexOutOfBounds: public std::exception {
 };
 
 class InvalidIterator: public std::exception {
+};
+class InvalidInput: std::exception {
 };
 
 #endif /* EXCEPTIONS_H_ */

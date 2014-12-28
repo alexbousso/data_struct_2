@@ -28,11 +28,24 @@ class AVLTree {
 	class PrintSubTree;
 	class CopyTree;
 
+	//TODO fix this!!!
+/*	class DataDoesNotExist: std::exception {
+	};
+	class InvalidInput: std::exception {
+	};
+	class InputAlreadyExists: std::exception {
+	};
+	class BadTreeElement: std::exception {
+	};
+*/
 	//inserting a new object to the tree under a specific root
 	void insert(AVLNode*, const T&);
 
-	//searching for an object in a specific sub tree
-	AVLNode* find(AVLNode*, const T&) const;
+	/*searching for an object in a specific sub tree, if the int is 1,
+	 it means the find should substruct 1 from the weight of every node in the search path
+	 cuz it's a removal find. else: do a regular find
+	 */
+	AVLNode* find(AVLNode*, const T&, int) const;
 
 	//removing an object from a specific subtree
 	void remove(AVLNode*);
@@ -54,6 +67,9 @@ class AVLTree {
 
 	//returns the min from a tree with a specific root
 	T getMin(AVLNode*);
+
+	//returns the min from a tree with a specific root
+	int calcWeight(AVLNode*);
 
 	//pre-order walk
 	template<typename Function>
@@ -88,11 +104,17 @@ class AVLTree {
 	//updating all the heights in a subtree
 	void updateHight(AVLNode*, AVLNode*);
 
+	//updating the weight of all the nodes in a subtree
+	void updateWeight(AVLNode*, AVLNode*);
+
 	//finding the next node with bad BF
 	AVLNode* findBadBF(AVLNode*);
 
 	//update balance factor of the first broken node from a specific start point
 	AVLNode* updateBF(AVLNode*);
+
+	//recursivly looking for the k-th node
+	T select(AVLNode*, int);
 
 	class DeleteNode {
 	public:
@@ -142,6 +164,12 @@ public:
 	//returns the min element in the tree
 	T getMin();
 
+	//returns the weight of a node
+	int getWeight(const T&);
+
+	//finds and returns a copy of the data in the k-th node
+	T select(int);
+
 	//in-order walk
 	template<typename Function>
 	void inOrder(Function&);
@@ -166,11 +194,12 @@ class AVLTree<T, Compare>::AVLNode {
 	AVLNode* right;
 	AVLNode* dad;
 	int hight;
+	int weight;
 	friend class AVLTree;
 	friend class Iterator;
 
 	AVLNode(T data) :
-			data(data), left(NULL), right(NULL), dad(NULL), hight(0) {
+			data(data), left(NULL), right(NULL), dad(NULL), hight(0), weight(1) {
 	}
 	AVLNode(const AVLNode&);
 	AVLNode operator=(const AVLNode&);
@@ -224,16 +253,26 @@ template<typename T, class Compare>
 void AVLTree<T, Compare>::insert(AVLTree<T, Compare>::AVLNode* currentRoot,
 		const T& element) {
 
-	if (compare(element, currentRoot->data) > 0) {//if the data is larger then the roots'
+	if (compare(element, currentRoot->data) > 0) { //if the data is larger then the roots'
 		if (currentRoot->right == NULL) {		//check if the right son is free
 			currentRoot->right = new AVLNode(element); //if it is, then set the right son to be the new node
 			currentRoot->right->dad = currentRoot;
+			currentRoot->weight += 1; //TODO check if i should be here!!! could cause bugs!!!
 			treeSize++;
 			updateHight(currentRoot, root);
+			//updateWeight(currentRoot, root);//update the weight of all nodes in the insert route
 			updateBF(currentRoot);
 			updateHight(currentRoot, root);	//after the rolls, update heights again
+			if (currentRoot->right != NULL) {//fix the weight of the right son if it exists
+				updateWeight(currentRoot->right, currentRoot->right);
+			}
+			if (currentRoot->left != NULL) {//fix the weight of the left son if it exists
+				updateWeight(currentRoot->left, currentRoot->left);
+			}
+			updateWeight(currentRoot, currentRoot);
 			return;
 		}
+		currentRoot->weight += 1;
 		return insert(currentRoot->right, element);	//if it isn't, look for a space in the right subtree
 	}
 	if (compare(element, currentRoot->data) < 0) {//if the data is smaller then the roots'
@@ -241,37 +280,54 @@ void AVLTree<T, Compare>::insert(AVLTree<T, Compare>::AVLNode* currentRoot,
 			currentRoot->left = new AVLNode(element); //if it is, then set the left son to be the new node
 			currentRoot->left->dad = currentRoot;
 			treeSize++;
+			currentRoot->weight += 1; //TODO check if i should be here!!! could cause bugs!!!
 			updateHight(currentRoot, root);
+			//updateWeight(currentRoot, root);//update the weight of all nodes in the insert route
 			updateBF(currentRoot);
 			updateHight(currentRoot, root);	//after the rolls, update heights again
+			if (currentRoot->right != NULL) {//fix the weight of the right son if it exists
+				updateWeight(currentRoot->right, currentRoot->right);
+			}
+			if (currentRoot->left != NULL) {//fix the weight of the left son if it exists
+				updateWeight(currentRoot->left, currentRoot->left);
+			}
+			updateWeight(currentRoot, currentRoot);
 			return;
 		}
+		currentRoot->weight += 1;
 		return insert(currentRoot->left, element);//if it isn't, look for a space in the left subtree
 	}
-	throw InputAlreadyExists();
+	throw DataAlreadyExists();
 }
 
 template<typename T, class Compare>
 T AVLTree<T, Compare>::find(const T& element) const {
 	if (root == NULL) {
-		throw DataDoesNotExist("tree");
+		throw DataDoesNotExist();
 	}
-	return (find(root, element))->data;
+	return (find(root, element, 0))->data;
 }
 
 template<typename T, class Compare>
 typename AVLTree<T, Compare>::AVLNode* AVLTree<T, Compare>::find(
-		AVLTree<T, Compare>::AVLNode* currentRoot, const T& element) const {
+		AVLTree<T, Compare>::AVLNode* currentRoot, const T& element,
+		int removeFind) const {
 	if (currentRoot == NULL) {
-		throw DataDoesNotExist("tree");
+		throw DataDoesNotExist();
 	}
 	if (compare(element, currentRoot->data) == 0) { //if it's the same object
 		return currentRoot;
 	}
 	if (compare(currentRoot->data, element) < 0) { //if the current is smaller, go to the right subtree
-		return find(currentRoot->right, element);
+		if (removeFind == 1) { //if it's a removal find, substruct 1 from the currentRoot
+			currentRoot->weight -= 1;
+		}
+		return find(currentRoot->right, element, removeFind);
 	}
-	return find(currentRoot->left, element); //else: the current is larger-search the left subtree
+	if (removeFind == 1) { //if it's a removal find, substruct 1 from the currentRoot
+		currentRoot->weight -= 1;
+	}
+	return find(currentRoot->left, element, removeFind); //else: the current is larger-search the left subtree
 
 }
 
@@ -305,6 +361,7 @@ void AVLTree<T, Compare>::rotateRight(
 			currentRoot->dad->left = currentRoot;
 		}
 	}
+	updateWeight(currentRoot->right, currentRoot);
 }
 
 template<typename T, class Compare>
@@ -332,6 +389,7 @@ void AVLTree<T, Compare>::rotateLeft(
 			currentRoot->dad->left = currentRoot;
 		}
 	}
+	updateWeight(currentRoot->left, currentRoot);
 }
 
 template<typename T, class Compare>
@@ -408,6 +466,7 @@ void AVLTree<T, Compare>::removeSingleChild(
 	}
 	updateHight(currentRoot->dad, currentRoot->dad);
 	updateBFAfterRemove(currentRoot->dad);
+	updateWeight(currentRoot->dad, root);
 	delete (currentRoot);
 }
 
@@ -424,10 +483,10 @@ bool AVLTree<T, Compare>::findIsIn(T& element) {
 template<typename T, class Compare>
 void AVLTree<T, Compare>::remove(AVLTree<T, Compare>::AVLNode* currentRoot) {
 	if (currentRoot == NULL) {
-		throw DataDoesNotExist("tree");
+		throw DataDoesNotExist();
 	}
 
-	if (currentRoot->left == NULL && currentRoot->right == NULL) {//if current has no offsprings
+	if (currentRoot->left == NULL && currentRoot->right == NULL) {//if current has no offsprings -leaf
 		AVLNode* tempDad = currentRoot->dad;
 		if (tempDad == NULL) {					//if wer'e at the root:
 			delete (currentRoot);
@@ -466,7 +525,7 @@ void AVLTree<T, Compare>::remove(AVLTree<T, Compare>::AVLNode* currentRoot) {
 
 template<typename T, class Compare>
 void AVLTree<T, Compare>::remove(const T& element) {
-	AVLNode* toRemove = find(root, element);
+	AVLNode* toRemove = find(root, element, 1);
 	remove(toRemove);
 	treeSize--;
 	if (treeSize != 0) {
@@ -560,6 +619,60 @@ void AVLTree<T, Compare>::updateBFAfterRemove(
 }
 
 template<typename T, class Compare>
+void AVLTree<T, Compare>::updateWeight(AVLTree<T, Compare>::AVLNode* start,
+		AVLTree<T, Compare>::AVLNode* end) {
+	int lW = start->left == NULL ? 0 : start->left->weight, rW = //calc the subtrees weights
+			start->right == NULL ? 0 : start->right->weight;
+
+	if (start == end) {						//if we are at the root/stop point
+		end->weight = 1 + lW + rW;
+		return;
+	}
+	start->weight = 1 + lW + rW;	//sum the weight of left and right and add 1
+	updateWeight(start->dad, end);		//update the rest of the tree
+}
+
+template<typename T, class Compare>
+T AVLTree<T, Compare>::select(int k) {
+	if (k < 1 || k > treeSize) {
+		throw DataDoesNotExist();
+	}
+	return select(root, k);
+}
+
+template<typename T, class Compare>
+T AVLTree<T, Compare>::select(AVLTree<T, Compare>::AVLNode* currentRoot,
+		int k) {
+	int leftW = calcWeight(currentRoot->left);
+	if (leftW == k - 1){ //if you're the k-th node
+			//|| (currentRoot->left == NULL && currentRoot->right == NULL)) {
+		return currentRoot->data;
+	}
+	if (leftW > k - 1) {//if the k-th node is in the left subtree
+		return select(currentRoot->left, k);
+	}
+	return select(currentRoot->right, k - leftW - 1);
+}
+
+template<typename T, class Compare>
+int AVLTree<T, Compare>::calcWeight(AVLTree<T, Compare>::AVLNode* currentRoot){
+	if (currentRoot == NULL){
+		return 0;
+	}
+	return currentRoot->weight;
+}
+
+template<typename T, class Compare>
+int AVLTree<T, Compare>::getWeight(const T& element) {
+	try {
+		AVLNode* wanted = find(root, element, 0);
+		return wanted->weight;
+	} catch (DataDoesNotExist& e) {
+		return -1;
+	}
+}
+
+template<typename T, class Compare>
 T AVLTree<T, Compare>::getMax() {
 	return max->data;
 }
@@ -567,7 +680,7 @@ T AVLTree<T, Compare>::getMax() {
 template<typename T, class Compare>
 T AVLTree<T, Compare>::getMax(AVLTree<T, Compare>::AVLNode* currentRoot) {
 	if (currentRoot == NULL) {
-		throw DataDoesNotExist("tree");
+		throw DataDoesNotExist();
 	}
 	if (currentRoot->right == NULL) {
 		return currentRoot->data;
@@ -578,7 +691,7 @@ T AVLTree<T, Compare>::getMax(AVLTree<T, Compare>::AVLNode* currentRoot) {
 template<typename T, class Compare>
 void AVLTree<T, Compare>::setMax(AVLTree<T, Compare>::AVLNode* currentRoot) {
 	if (currentRoot == NULL) {
-		throw DataDoesNotExist("tree");
+		throw DataDoesNotExist();
 	}
 	if (currentRoot->right == NULL) { //if you can't go right anymore-you're the rightmose therefor the max element!
 		max = currentRoot;
@@ -595,35 +708,35 @@ T AVLTree<T, Compare>::getMin() {
 template<typename T, class Compare>
 T AVLTree<T, Compare>::getMin(AVLTree<T, Compare>::AVLNode* currentRoot) {
 	if (currentRoot == NULL) {
-		throw DataDoesNotExist("tree");
+		throw DataDoesNotExist();
 	}
 	if (currentRoot->left == NULL) {
 		return currentRoot->data;
 	}
 	return getMin(currentRoot->left);
 }
-
-template<typename T, class Compare>
-class AVLTree<T, Compare>::CheckRoot {
-	friend class AVLTree;
-public:
-	void operator()(AVLNode* currentRoot) const {
-		if (currentRoot == NULL) {
-			return;
-		}
-		if (currentRoot->left != NULL) {		//if u have a left son
-			if (currentRoot->left->dad != currentRoot) {//if your left sons' dad isn't you
-				throw BadTreeElement<T>(currentRoot->data);
-			}
-		}
-		if (currentRoot->right != NULL) { //if u have a right son
-			if (currentRoot->right->dad != currentRoot) { //if your right sons' dad isn't you
-				throw BadTreeElement<T>(currentRoot->data);
-			}
-		}
-	}
-};
-
+/*
+ template<typename T, class Compare>
+ class AVLTree<T, Compare>::CheckRoot {
+ friend class AVLTree;
+ public:
+ void operator()(AVLNode* currentRoot) const {
+ if (currentRoot == NULL) {
+ return;
+ }
+ if (currentRoot->left != NULL) {		//if u have a left son
+ if (currentRoot->left->dad != currentRoot) {//if your left sons' dad isn't you
+ throw BadTreeElement < T > (currentRoot->data);
+ }
+ }
+ if (currentRoot->right != NULL) { //if u have a right son
+ if (currentRoot->right->dad != currentRoot) { //if your right sons' dad isn't you
+ throw BadTreeElement < T > (currentRoot->data);
+ }
+ }
+ }
+ };
+ */
 template<typename T, class Compare>
 class AVLTree<T, Compare>::PrintSubTree {
 	friend class AVLTree;
@@ -641,20 +754,20 @@ public:
 		}
 	}
 };
+/*
+ template<typename T, class Compare>
+ bool AVLTree<T, Compare>::checkTree() {
 
-template<typename T, class Compare>
-bool AVLTree<T, Compare>::checkTree() {
+ try {
+ CheckRoot checker;
+ preOrder(root, checker);
+ } catch (BadTreeElement<T>& badElement) {
+ return false;
+ }
+ return true;
 
-	try {
-		CheckRoot checker;
-		preOrder(root, checker);
-	} catch (BadTreeElement<T>& badElement) {
-		return false;
-	}
-	return true;
-
-}
-
+ }
+ */
 template<typename T, class Compare>
 template<typename Function>
 void AVLTree<T, Compare>::preOrder(AVLTree<T, Compare>::AVLNode* currentRoot,
