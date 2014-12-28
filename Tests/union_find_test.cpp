@@ -84,8 +84,8 @@ static bool testUnionFindUnite(){
 	ASSERT_EQUALS(5, uf.getMaxIndex(4));
 	ASSERT_EQUALS(5, uf.getMaxIndex(5));
 
-	ASSERT_THROWS(InvalidInput, uf.unite(4, 1));	//4 isn't the max of it's tree
-	ASSERT_THROWS(InvalidInput, uf.unite(1, 2));	//2 isn't the max of it's tree
+	ASSERT_THROWS(Failure, uf.unite(4, 1));	//4 isn't the max of it's tree
+	ASSERT_THROWS(Failure, uf.unite(1, 2));	//2 isn't the max of it's tree
 	ASSERT_THROWS(InvalidInput, uf.unite(10, 1));	//10>7=size
 	ASSERT_THROWS(InvalidInput, uf.unite(1, 9));	//9>7=size
 

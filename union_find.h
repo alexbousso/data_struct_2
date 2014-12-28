@@ -158,15 +158,18 @@ void UnionFind<T, Compare>::printUF() const {
 template<typename T, typename Compare>
 void UnionFind<T, Compare>::unite(int element1, int element2) {
 	if (element1 < 0 || element1 > ufSize - 1 || element2 < 0
-			|| element2 > ufSize - 1 || tree[find(element1)].max != element1
-			|| tree[find(element2)].max != element2) {
+			|| element2 > ufSize - 1) {
 		throw InvalidInput();
+	}
+	if(tree[find(element1)].max != element1
+			|| tree[find(element2)].max != element2){
+		throw Failure();
 	}
 
 	int root1 = find(element1), root2 = find(element2);
-/*	if ((tree(root1).max != element1) || (tree(root2).max != element2)) {
-		throw InvalidInput();
-	}*/
+	if(root1 == root2){ //TODO test this case!
+		throw Failure();
+	}
 	//the groups are valid, so check which is the largest
 	if (tree[root1].size >= tree[root2].size) { //if the first tree is larger (or equal)
 		tree[root1].size += tree[root2].size; //let the sum of the sizes be the size of the root

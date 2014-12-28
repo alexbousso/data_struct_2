@@ -20,6 +20,9 @@ class ListIsEmpty: public std::exception {
 class IndexOutOfBounds: public std::exception {
 };
 
+class Failure: public std::exception {
+};
+
 class InvalidIterator: public std::exception {
 };
 
