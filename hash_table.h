@@ -199,7 +199,7 @@ template<typename T, typename HashFunction>
 T& HashTable<T, HashFunction>::getData(int key) {
 	for (typename List<T>::Iterator it(table[index(key)].begin());
 			it != table[index(key)].end(); ++it) {
-		if (key == *it) {
+		if (*it == key) {
 			return *it;
 		}
 	}

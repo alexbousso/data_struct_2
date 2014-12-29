@@ -43,14 +43,10 @@ public:
 	bool operator==(Citizen other) {
 		return ID == other.ID;
 	}
+
+	bool operator==(int ID) {
+		return this->ID == ID;
+	}
 };
-
-bool operator==(Citizen citizen, int ID) {
-	return citizen.getID() == ID;
-}
-
-bool operator==(int ID, Citizen citizen) {
-	return citizen.getID() == ID;
-}
 
 #endif /* CITIZEN_H_ */

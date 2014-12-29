@@ -26,4 +26,10 @@
 #define ASSERT_DATA_DOES_NOT_EXIST(arg) \
 	ASSERT_THROWS(DataDoesNotExist, arg)
 
+#define ASSERT_INVALID_INPUT(arg) \
+	ASSERT_THROWS(InvalidInput, arg)
+
+#define ASSERT_FAILURE(arg) \
+	ASSERT_THROWS(Failure, arg)
+
 #endif /* ASSERT_H_ */

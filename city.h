@@ -10,15 +10,13 @@
 
 #include <cassert>
 
-static int CITY_ID_INITIALIZER = 0;
-
 class City {
 	int population;
 	int cityID;
 
 public:
 	City() :
-			population(0), cityID(CITY_ID_INITIALIZER++) {
+			population(0), cityID(0) {
 	}
 
 	City(const City& copy) :
@@ -50,6 +48,10 @@ public:
 
 	int getCityID() {
 		return cityID;
+	}
+
+	void setCityID(int ID) {
+		cityID = ID;
 	}
 };
 

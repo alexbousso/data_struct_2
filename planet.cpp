@@ -25,9 +25,12 @@ void Planet::MoveToCity(int citizenID, int city) {
 		throw InvalidInput();
 	}
 	try {
-		Citizen citizen = citizens.getData(citizenID);
+		Citizen& citizen = citizens.getData(citizenID);
 		if (citizen.getLivingCity() != city && citizen.getLivingCity() >= 0) {
 			throw Failure();
+		}
+		if (citizen.getLivingCity() == city) {
+			return;
 		}
 		citizen.setLivingCity(city);
 		City dest(kingdoms.getData(city));

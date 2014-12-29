@@ -34,10 +34,21 @@ public:
 	}
 
 	int operator()(Citizen citizen) const {
-		return (citizen.getLivingCity() % n);
+		return (citizen.getID() % n);
 	}
 	int operator()(int num) const {
 		return num % n;
+	}
+};
+
+class UpdateCityID {
+	int ID;
+public:
+	UpdateCityID(int ID) :
+			ID(ID) {
+	}
+	void operator()(City& city) {
+		city.setCityID(ID);
 	}
 };
 
@@ -50,6 +61,13 @@ class Planet {
 public:
 	Planet(int cityNum) :
 			kingdoms(cityNum), cities(), citizens(), numberOfCities(cityNum) {
+		if (cityNum < 2) {
+			throw InvalidInput();
+		}
+		for (int i = 0; i < cityNum; i++) {
+			kingdoms.updateElement(i, UpdateCityID(i));
+			cities.insert(kingdoms.getData(i));
+		}
 	}
 
 	/*
