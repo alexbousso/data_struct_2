@@ -39,3 +39,53 @@ void Planet::MoveToCity(int citizenID, int city) {
 		throw Failure();
 	}
 }
+
+void Planet::JoinKingdoms(int city1, int city2) {
+	kingdoms.unite(city1, city2);
+}
+
+
+//TODO will this code throw failure back or will it catch it's own throw!?!?
+void Planet::GetCapital(int citizenID, int* capital) {
+	if (citizenID < 0 || capital == NULL) {
+		throw InvalidInput();
+	}
+	try {
+		int livingCity = (citizens.getData(citizenID)).getLivingCity();
+		if (!citizens.find(citizenID) || livingCity < 0) {
+			throw Failure();
+		}
+
+		*capital = kingdoms.find(livingCity);
+	} catch (DataDoesNotExist& noData) {
+		throw Failure();
+	}
+
+}
+
+void Planet::SelectCity(int k, int* city) {
+	if (k < 0 || city == NULL) {
+		throw InvalidInput();
+	}
+	if (k >= numberOfCities) {
+		throw Failure();
+	}
+	*city = (cities.select(k)).getCityID();
+}
+
+class FillCitiesArray {
+	int* cities;
+	int index;
+public:
+	FillCitiesArray(int* cities) :
+			index(0), cities(cities) {
+	}
+	void operator()(City c) {
+		cities[index] = c.getCityID();
+	}
+};
+
+void Planet::GetCitiesBySize(int citiesArr[]) {
+	FillCitiesArray functor(citiesArr);
+	cities.inOrder(functor);
+}

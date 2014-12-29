@@ -38,7 +38,6 @@ public:
 static bool testUnionFindFind(){
 
 	UnionFind <int, CompareInt> uf(10);
-//	ASSERT_NO_THROW(uf.printUF());
 	ASSERT_EQUALS(4, uf.find(4));
 	ASSERT_THROWS(DataDoesNotExist, uf.find(10));
 
@@ -139,8 +138,6 @@ static bool testUnionFindUpdateElement(){
 
 	ASSERT_NO_THROW(uf.updateElement(1, IncreaseInt(20)));
 	ASSERT_EQUALS(1, uf.getMaxIndex(7));
-
-	uf.printUF();
 
 	ASSERT_NO_THROW(uf.unite(9, 1));
 	ASSERT_EQUALS(7, uf.getParent(4));
