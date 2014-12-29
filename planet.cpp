@@ -44,8 +44,7 @@ void Planet::JoinKingdoms(int city1, int city2) {
 	kingdoms.unite(city1, city2);
 }
 
-
-//TODO will this code throw failure back or will it catch it's own throw!?!?
+//TODO make sure the logics are fine
 void Planet::GetCapital(int citizenID, int* capital) {
 	if (citizenID < 0 || capital == NULL) {
 		throw InvalidInput();
@@ -78,10 +77,10 @@ class FillCitiesArray {
 	int index;
 public:
 	FillCitiesArray(int* cities) :
-			index(0), cities(cities) {
+			cities(cities), index(0) {
 	}
 	void operator()(City c) {
-		cities[index] = c.getCityID();
+		cities[index++] = c.getCityID();
 	}
 };
 

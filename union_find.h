@@ -22,7 +22,7 @@ class UnionFind {
 	//a list used for route shrinking
 	List<int> route;
 
-	UnionFind(const UnionFind&);
+	UnionFind(const UnionFind&); //TODO ask why is this here!
 	UnionFind& operator=(const UnionFind&);
 
 	//returns a reference to the data of the i node
