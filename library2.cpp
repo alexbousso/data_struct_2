@@ -62,11 +62,11 @@ StatusType JoinKingdoms(void* DS, int city1, int city2) {
 }
 
 StatusType GetCapital(void* DS, int citizenID, int* capital) {
-	if (DS == NULL) {
+	if (DS == NULL || !capital) {
 		return INVALID_INPUT;
 	}
 	try {
-		(static_cast<Planet*>(DS))->GetCapital(citizenID, capital);
+		*capital = (static_cast<Planet*>(DS))->GetCapital(citizenID);
 	} catch (InvalidInput& badInput) {
 		return INVALID_INPUT;
 	} catch (Failure& fail) {
@@ -80,7 +80,7 @@ StatusType SelectCity(void* DS, int k, int* city) {
 		return INVALID_INPUT;
 	}
 	try {
-		(static_cast<Planet*>(DS))->SelectCity(k, city);
+		*city = (static_cast<Planet*>(DS))->SelectCity(k);
 	} catch (DataDoesNotExist& noData) {
 		return FAILURE;
 	} catch (Failure& fail) {

@@ -9,6 +9,7 @@
 #define CITY_H_
 
 #include <cassert>
+#include <iostream>
 
 class City {
 	int population;
@@ -42,16 +43,28 @@ public:
 		--population;
 	}
 
-	int getPopulation() {
+	int getPopulation() const {
 		return population;
 	}
 
-	int getCityID() {
+	int getCityID() const {
 		return cityID;
 	}
 
 	void setCityID(int ID) {
 		cityID = ID;
+	}
+
+	// QUESTION: Why when removing this function from the class, it does not
+	// compile?
+	friend std::ostream& operator<<(std::ostream& os, const City& city) {
+		os << "CityID: ";
+		os.width(4);
+		os << city.cityID << ", population: ";
+		os.width(3);
+		os << city.population;
+
+		return os;
 	}
 };
 

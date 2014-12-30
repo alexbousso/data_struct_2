@@ -30,6 +30,35 @@ static void bringCitizens(Planet& planet) {
 }
 
 static void placeCitizens(Planet& planet) {
+	/**
+	 * City:	| Citizens:
+	 * 		0	| 346, 740
+	 * 		1	| 274, 341
+	 * 		2	| 853
+	 * 		3	| 949
+	 * 		4	| 856, 143, 474
+	 * 		5	| 576
+	 * 		6	|
+	 * 		7	| 742
+	 * 		8	| 264
+	 * 		9	| 784, 889
+	 * 		10	| 697
+	 * 		11	|
+	 * 		12	|
+	 * 		13	| 390
+	 * 		14	| 481, 720, 710, 482
+	 *
+	 * Kingdoms:
+	 * Capital:	| Cities:
+	 * 		0	| 0, 1, 7, 2, 4
+	 * 		3	| 3
+	 * 		5	| 5, 6, 10, 9
+	 * 		8	| 8
+	 * 		11	| 11
+	 * 		12	| 12
+	 * 		13	| 13
+	 * 		14	| 14
+	 */
 	planet.MoveToCity(856, 4);
 	planet.MoveToCity(274, 1);
 	planet.MoveToCity(784, 9);
@@ -105,6 +134,103 @@ static bool testJoinKingdoms() {
 
 	bringCitizens(planet);
 
+	ASSERT_NO_THROW(planet.JoinKingdoms(6, 10));
+	ASSERT_NO_THROW(planet.JoinKingdoms(6, 9));
+	ASSERT_NO_THROW(planet.JoinKingdoms(6, 5));
+
+	/**
+	 * Kingdoms:
+	 * Capital:	| Cities:
+	 * 		0	| 0, 1, 7, 2, 4
+	 * 		3	| 3
+	 * 		5	| 5, 6, 10, 9
+	 * 		8	| 8
+	 * 		11	| 11
+	 * 		12	| 12
+	 * 		13	| 13
+	 * 		14	| 14
+	 */
+
+	ASSERT_FAILURE(planet.JoinKingdoms(6, 4));
+	ASSERT_FAILURE(planet.JoinKingdoms(6, 0));
+	ASSERT_FAILURE(planet.JoinKingdoms(7, 0));
+
+	placeCitizens(planet);
+
+	/**
+	 * Kingdoms:
+	 * Capital:	| Cities:
+	 * 		4	| 0, 1, 7, 2, 4
+	 * 		3	| 3
+	 * 		9	| 5, 6, 10, 9
+	 * 		8	| 8
+	 * 		11	| 11
+	 * 		12	| 12
+	 * 		13	| 13
+	 * 		14	| 14
+	 */
+
+	planet.print();
+
+	ASSERT_FAILURE(planet.JoinKingdoms(6, 4));
+	ASSERT_FAILURE(planet.JoinKingdoms(9, 1));
+	ASSERT_FAILURE(planet.JoinKingdoms(5, 0));
+	ASSERT_NO_THROW(planet.JoinKingdoms(4, 9));
+
+	ASSERT_NO_THROW(planet.JoinKingdoms(8, 11));
+	ASSERT_FAILURE(planet.JoinKingdoms(9, 13));
+	ASSERT_FAILURE(planet.JoinKingdoms(11, 6));
+	ASSERT_NO_THROW(planet.JoinKingdoms(8, 4));
+	ASSERT_NO_THROW(planet.JoinKingdoms(4, 14));
+	ASSERT_FAILURE(planet.JoinKingdoms(2, 13));
+	ASSERT_NO_THROW(planet.JoinKingdoms(14, 13));
+
+	/**
+	 * Kingdoms:
+	 * Capital:	| Cities:
+	 * 		14	| 0, 1, 7, 2, 4, 8, 11, 14, 13, 5, 6, 10, 9
+	 * 		3	| 3
+	 * 		12	| 12
+	 */
+
+	return true;
+}
+
+static bool testGetCapital() {
+	Planet planet(NUMBER_OF_CITIES);
+
+	ASSERT_INVALID_INPUT(planet.GetCapital(-42));
+	bringCitizens(planet);
+	ASSERT_FAILURE(planet.GetCapital(10));
+	ASSERT_FAILURE(planet.GetCapital(889));
+	placeCitizens(planet);
+	ASSERT_NO_THROW(planet.AddCitizen(42));
+	ASSERT_FAILURE(planet.GetCapital(42));
+
+	ASSERT_EQUALS(planet.GetCapital(346), 0);
+	ASSERT_NO_THROW(planet.JoinKingdoms(0, 8));
+	ASSERT_EQUALS(planet.GetCapital(346), 0);
+	ASSERT_NO_THROW(planet.JoinKingdoms(5, 3));
+	ASSERT_EQUALS(planet.GetCapital(576), 3);
+	ASSERT_NO_THROW(planet.JoinKingdoms(0, 14));
+	ASSERT_EQUALS(planet.GetCapital(264), 14);
+	ASSERT_EQUALS(planet.GetCapital(740), 14);
+	ASSERT_NO_THROW(planet.JoinKingdoms(9, 4));
+	ASSERT_EQUALS(planet.GetCapital(784), 4);
+	ASSERT_NO_THROW(planet.JoinKingdoms(14, 4));
+	ASSERT_EQUALS(planet.GetCapital(143), 14);
+
+	return true;
+}
+
+static bool testSelectCity() {
+	Planet planet(NUMBER_OF_CITIES);
+
+	ASSERT_INVALID_INPUT(planet.SelectCity(-42));
+	ASSERT_FAILURE(planet.SelectCity(NUMBER_OF_CITIES));
+
+	ASSERT_EQUALS(planet.SelectCity(3), 3);
+
 	return true;
 }
 
@@ -112,6 +238,8 @@ int main() {
 	RUN_TEST(testAddCitizen());
 	RUN_TEST(testMoveToCity());
 	RUN_TEST(testJoinKingdoms());
+	RUN_TEST(testGetCapital());
+	RUN_TEST(testSelectCity());
 
 	return 0;
 }

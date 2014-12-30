@@ -225,9 +225,17 @@ void HashTable<T, HashFunction>::print(std::ostream& os) {
 		for (typename List<T>::Iterator it(table[i].begin());
 				it != table[i].end(); ++it) {
 			if (it != table[i].begin()) {
-				os << " -> ";
+				os << std::endl << "             |  ";
 			}
 			os << *it;
+		}
+		os << std::endl;
+		for (int i = 0; i < 13; i++) {
+			os << '-';
+		}
+		os << '|';
+		for (int i = 0; i < 66; i++) {
+			os << '-';
 		}
 		os << std::endl;
 	}

@@ -148,9 +148,15 @@ template<typename T, typename Compare>
 void UnionFind<T, Compare>::printUF() const {
 	cout << "\n";
 	for (int i = 0; i < ufSize; i++) {
-		cout << "index: " << i << " | data: " << tree[i].data << " | max: "
-				<< tree[i].max << " | parent: " << tree[i].parent << " | size: "
-				<< tree[i].size << "\n";
+		cout << "index: ";
+		cout.width(3);
+		cout << i << " | data: " << tree[i].data << " | max: ";
+		cout.width(3);
+		cout << tree[i].max << " | parent: ";
+		cout.width(3);
+		cout << tree[i].parent << " | size: ";
+		cout.width(3);
+		cout << tree[i].size << "\n";
 	}
 }
 

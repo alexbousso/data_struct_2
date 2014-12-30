@@ -9,6 +9,7 @@
 #define CITIZEN_H_
 
 #include "exceptions.h"
+#include <iostream>
 
 class Citizen {
 	const int ID;
@@ -25,7 +26,7 @@ public:
 		}
 	}
 
-	int getID() {
+	int getID() const {
 		return ID;
 	}
 
@@ -36,16 +37,28 @@ public:
 		this->livingCity = livingCity;
 	}
 
-	int getLivingCity() {
+	int getLivingCity() const {
 		return livingCity;
 	}
 
-	bool operator==(Citizen other) {
+	bool operator==(Citizen other) const {
 		return ID == other.ID;
 	}
 
-	bool operator==(int ID) {
+	bool operator==(int ID) const {
 		return this->ID == ID;
+	}
+
+	// QUESTION: Why when removing this function from the class, it does not
+	// compile?
+	friend std::ostream& operator<<(std::ostream& os, const Citizen& citizen) {
+		os << "ID: ";
+		os.width(4);
+		os << citizen.ID << ", lives in: ";
+		os.width(3);
+		os << citizen.livingCity;
+
+		return os;
 	}
 };
 

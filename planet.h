@@ -84,25 +84,29 @@ public:
 	 * uniting to kingdoms into one.
 	 * only if the 2 cities sent are the capitals of their kingdom
 	 */
-	void JoinKingdoms(int, int);
+	void JoinKingdoms(int city1, int city2);
 
 	/*
 	 * returns the city in which the given citizen is living
 	 */
-	void GetCapital(int, int*);
+	int GetCapital(int citizenID);
 
 	/*
 	 * returns the k-th city by size.
 	 * if 2 cities are of the same size-them will return the one
 	 * with the smaller id
 	 */
-	void SelectCity(int, int*);
+	int SelectCity(int k);
 
 	/*
 	 * fills up an array with the cities organized by order
 	 */
-	void GetCitiesBySize(int*);
+	void GetCitiesBySize(int* citiesArr);
 
+	/**
+	 * Prints the current state of the whole data structure.
+	 */
+	void print();
 };
 
 #endif /* PLANET_H_ */

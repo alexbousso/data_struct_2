@@ -735,9 +735,9 @@ public:
 		if (currentRoot == NULL) {
 			return;
 		}
-		cout << "subs root is: " << currentRoot->data << "\n";
+		cout << "\nsubs root is: " << currentRoot->data << "\n";
 		if (currentRoot->left != NULL) {		//if u have a left son
-			cout << "left son is: " << currentRoot->left->data << "\n";
+			cout << "left son is:  " << currentRoot->left->data << "\n";
 		}
 		if (currentRoot->right != NULL) { //if u have a right son
 			cout << "right son is: " << currentRoot->right->data << "\n";
