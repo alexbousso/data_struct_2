@@ -68,7 +68,7 @@ public:
 	 *
 	 * @param os - The output stream function (default is std::cout).
 	 */
-	void print(std::ostream& os = std::cout);
+	void print(std::ostream& os = std::cout) const;
 
 private:
 	/**
@@ -216,7 +216,7 @@ void HashTable<T, HashFunction>::reset() {
 }
 
 template<typename T, typename HashFunction>
-void HashTable<T, HashFunction>::print(std::ostream& os) {
+void HashTable<T, HashFunction>::print(std::ostream& os) const {
 	os << "List number: | List elements:" << std::endl;
 	for (int i = 0; i < tableSize; i++) {
 		os << ' ';

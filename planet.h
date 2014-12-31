@@ -14,13 +14,24 @@
 #include "city.h"
 #include "citizen.h"
 
-class CompareCities {
+class CompareCitiesUF {
 public:
 	int operator()(City a, City b) const {
 		if (a.getPopulation() != b.getPopulation()) {
 			return a.getPopulation() - b.getPopulation();
 		} else {
 			return b.getCityID() - a.getCityID();
+		}
+	}
+};
+
+class CompareCitiesTree {
+public:
+	int operator()(City a, City b) const {
+		if (a.getPopulation() != b.getPopulation()) {
+			return a.getPopulation() - b.getPopulation();
+		} else {
+			return a.getCityID() - b.getCityID();
 		}
 	}
 };
@@ -53,8 +64,8 @@ public:
 };
 
 class Planet {
-	UnionFind<City, CompareCities> kingdoms;
-	AVLTree<City, CompareCities> cities;
+	UnionFind<City, CompareCitiesUF> kingdoms;
+	AVLTree<City, CompareCitiesTree> cities;
 	HashTable<Citizen, ModuloCitizens> citizens;
 	int numberOfCities;
 

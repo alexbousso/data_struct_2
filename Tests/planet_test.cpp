@@ -29,36 +29,57 @@ static void bringCitizens(Planet& planet) {
 	planet.AddCitizen(889);
 }
 
+/**
+ * This following data assumes there are no citizens living in any city.
+ * Kingdoms:
+ * 		Capital | Cities
+ * 			0	| 0, 2, 4, 8, 9, 11
+ * 			3	| 3, 10, 14
+ * 			1	| 1, 7, 12, 13
+ * 			6	| 6
+ * 			5	| 5
+ */
+static void setKingdoms(Planet& planet) {
+	planet.JoinKingdoms(0, 2);
+	planet.JoinKingdoms(0, 4);
+	planet.JoinKingdoms(0, 8);
+	planet.JoinKingdoms(0, 9);
+	planet.JoinKingdoms(0, 11);
+	planet.JoinKingdoms(3, 10);
+	planet.JoinKingdoms(3, 14);
+	planet.JoinKingdoms(1, 7);
+	planet.JoinKingdoms(1, 12);
+	planet.JoinKingdoms(1, 13);
+}
+
+/**
+ * City:	| Citizens:
+ * 		0	| 346, 740
+ * 		1	| 274, 341
+ * 		2	| 853
+ * 		3	| 949
+ * 		4	| 856, 143, 474
+ * 		5	| 576
+ * 		6	|
+ * 		7	| 742
+ * 		8	| 264
+ * 		9	| 784, 889
+ * 		10	| 697
+ * 		11	|
+ * 		12	|
+ * 		13	| 390
+ * 		14	| 481, 720, 710, 482
+ *
+ * If the function setKingdoms() is called after this function, then:
+ * Kingdoms:
+ * 		Capital | Cities
+ * 			4	| 0, 2, 4, 8, 9, 11
+ * 			14	| 3, 10, 14
+ * 			1	| 1, 7, 12, 13
+ * 			6	| 6
+ * 			5	| 5
+ */
 static void placeCitizens(Planet& planet) {
-	/**
-	 * City:	| Citizens:
-	 * 		0	| 346, 740
-	 * 		1	| 274, 341
-	 * 		2	| 853
-	 * 		3	| 949
-	 * 		4	| 856, 143, 474
-	 * 		5	| 576
-	 * 		6	|
-	 * 		7	| 742
-	 * 		8	| 264
-	 * 		9	| 784, 889
-	 * 		10	| 697
-	 * 		11	|
-	 * 		12	|
-	 * 		13	| 390
-	 * 		14	| 481, 720, 710, 482
-	 *
-	 * Kingdoms:
-	 * Capital:	| Cities:
-	 * 		0	| 0, 1, 7, 2, 4
-	 * 		3	| 3
-	 * 		5	| 5, 6, 10, 9
-	 * 		8	| 8
-	 * 		11	| 11
-	 * 		12	| 12
-	 * 		13	| 13
-	 * 		14	| 14
-	 */
 	planet.MoveToCity(856, 4);
 	planet.MoveToCity(274, 1);
 	planet.MoveToCity(784, 9);
@@ -170,8 +191,6 @@ static bool testJoinKingdoms() {
 	 * 		14	| 14
 	 */
 
-	planet.print();
-
 	ASSERT_FAILURE(planet.JoinKingdoms(6, 4));
 	ASSERT_FAILURE(planet.JoinKingdoms(9, 1));
 	ASSERT_FAILURE(planet.JoinKingdoms(5, 0));
@@ -230,7 +249,48 @@ static bool testSelectCity() {
 	ASSERT_FAILURE(planet.SelectCity(NUMBER_OF_CITIES));
 
 	ASSERT_EQUALS(planet.SelectCity(3), 3);
+	ASSERT_EQUALS(planet.SelectCity(14), 14);
 
+	bringCitizens(planet);
+	ASSERT_EQUALS(planet.SelectCity(0), 0);
+
+	setKingdoms(planet);
+	placeCitizens(planet);
+
+	ASSERT_EQUALS(planet.SelectCity(3), 2);
+	ASSERT_EQUALS(planet.SelectCity(9), 13);
+	ASSERT_EQUALS(planet.SelectCity(14), 14);
+
+	ASSERT_FAILURE(planet.SelectCity(NUMBER_OF_CITIES));
+
+	return true;
+}
+
+static bool testGetCitiesBySize() {
+	Planet planet(NUMBER_OF_CITIES);
+	int *cities(new int[NUMBER_OF_CITIES]);
+
+	planet.GetCitiesBySize(cities);
+	for (int i = 0; i < NUMBER_OF_CITIES; i++) {
+		ASSERT_EQUALS(cities[i], i);
+	}
+
+	bringCitizens(planet);
+	setKingdoms(planet);
+
+	planet.GetCitiesBySize(cities);
+	for (int i = 0; i < NUMBER_OF_CITIES; i++) {
+		ASSERT_EQUALS(cities[i], i);
+	}
+
+	placeCitizens(planet);
+
+	planet.GetCitiesBySize(cities);
+	for (int i = 0; i < NUMBER_OF_CITIES; i++) {
+		ASSERT_EQUALS(cities[i], planet.SelectCity(i));
+	}
+
+	delete[] cities;
 	return true;
 }
 
@@ -240,6 +300,7 @@ int main() {
 	RUN_TEST(testJoinKingdoms());
 	RUN_TEST(testGetCapital());
 	RUN_TEST(testSelectCity());
+	RUN_TEST(testGetCitiesBySize());
 
 	return 0;
 }

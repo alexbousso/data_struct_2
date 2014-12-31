@@ -22,7 +22,7 @@ class UnionFind {
 	//a list used for route shrinking
 	List<int> route;
 
-	UnionFind(const UnionFind&); //TODO ask why is this here!
+	UnionFind(const UnionFind&);
 	UnionFind& operator=(const UnionFind&);
 
 	//returns a reference to the data of the i node
@@ -39,8 +39,6 @@ public:
 	 * if the input aren't groups-InvalidInput is thrown
 	 */
 	void unite(int, int);
-
-	//int getRoot(int); TODO check if this is relevant now that we know that the find does that!
 
 	//returns the max value in the tree (!!!!not assuming that the input is a root!!!!!)
 	int getMaxIndex(int);

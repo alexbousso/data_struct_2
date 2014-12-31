@@ -247,7 +247,7 @@ void AVLTree<T, Compare>::insert(AVLTree<T, Compare>::AVLNode* currentRoot,
 		if (currentRoot->right == NULL) {		//check if the right son is free
 			currentRoot->right = new AVLNode(element); //if it is, then set the right son to be the new node
 			currentRoot->right->dad = currentRoot;
-			currentRoot->weight += 1; //TODO check if i should be here!!! could cause bugs!!!
+			currentRoot->weight += 1;
 			treeSize++;
 			updateHight(currentRoot, root);
 			//updateWeight(currentRoot, root);//update the weight of all nodes in the insert route
@@ -270,7 +270,7 @@ void AVLTree<T, Compare>::insert(AVLTree<T, Compare>::AVLNode* currentRoot,
 			currentRoot->left = new AVLNode(element); //if it is, then set the left son to be the new node
 			currentRoot->left->dad = currentRoot;
 			treeSize++;
-			currentRoot->weight += 1; //TODO check if i should be here!!! could cause bugs!!!
+			currentRoot->weight += 1;
 			updateHight(currentRoot, root);
 			//updateWeight(currentRoot, root);//update the weight of all nodes in the insert route
 			updateBF(currentRoot);
