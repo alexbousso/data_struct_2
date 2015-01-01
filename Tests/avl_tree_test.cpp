@@ -10,7 +10,19 @@
 #include "assert.h"
 #include <string>
 
+
 std::string location;
+
+class FillTree{
+	int i;
+public:
+	FillTree() : i(0){}
+	void operator()(int& x){
+		x = i;
+		i++;
+	}
+};
+
 
 class CompareInt {
 public:
@@ -18,7 +30,6 @@ public:
 		return a - b;
 	}
 };
-
 
 static void setUp(AVLTree<int, CompareInt>& tree) {
 	tree.insert(4);
@@ -205,6 +216,35 @@ static bool testAVLTreeSelect() {
 	ASSERT_EQUALS(10, tree.select(5));
 	ASSERT_EQUALS(30, tree.select(8));
 
+	return true;
+}
+
+//TODO add tests
+static bool testAVLTreeBuildEmptyTree() {
+
+	CompareInt func;
+	AVLTree<int, CompareInt> tree(func);
+
+	ASSERT_NO_THROW(tree.buildEmptyTree(10));
+	FillTree filler;
+	ASSERT_NO_THROW(tree.inOrder(filler));
+	ASSERT_EQUALS(9, tree.getMax());
+
+	ASSERT_NO_THROW(tree.insert(200));
+	ASSERT_EQUALS(200, tree.getMax());
+
+	ASSERT_NO_THROW(tree.insert(250));
+
+	ASSERT_NO_THROW(tree.insert(230));
+	//ASSERT_NO_THROW(tree.printTree());
+
+	ASSERT_EQUALS(1, tree.select(2));
+	ASSERT_EQUALS(4, tree.select(5));
+	ASSERT_EQUALS(6, tree.select(7));
+	ASSERT_EQUALS(6, tree.select(7));
+	ASSERT_EQUALS(230, tree.select(12));
+
+
 
 
 
@@ -215,6 +255,7 @@ int main() {
 	RUN_TEST(testAVLTreeInsert());
 	RUN_TEST(testAVLTreeRemove());
 	RUN_TEST(testAVLTreeSelect());
+	RUN_TEST(testAVLTreeBuildEmptyTree());
 
 	return 0;
 }

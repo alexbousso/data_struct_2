@@ -63,6 +63,17 @@ public:
 	}
 };
 
+class UpdateCityInTree {
+	int ID;
+public:
+	UpdateCityInTree() : ID(0) {}
+
+	void operator()(City& city) {
+		city.setCityID(ID);
+		ID++;
+	}
+};
+
 class Planet {
 	UnionFind<City, CompareCitiesUF> kingdoms;
 	AVLTree<City, CompareCitiesTree> cities;
@@ -75,10 +86,12 @@ public:
 		if (cityNum < 2) {
 			throw InvalidInput();
 		}
+		cities.buildEmptyTree(cityNum);
 		for (int i = 0; i < cityNum; i++) {
 			kingdoms.updateElement(i, UpdateCityID(i));
-			cities.insert(kingdoms.getData(i));
 		}
+		UpdateCityInTree updater;
+		cities.inOrder(updater);
 	}
 
 	/*

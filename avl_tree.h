@@ -11,6 +11,8 @@
 #include <iostream>
 #include "exceptions.h"
 #include <cassert>
+#include <math.h>
+#include <complex.h>
 
 using std::cout;
 using std::endl;
@@ -69,7 +71,11 @@ class AVLTree {
 	template<typename Function>
 	void inOrder(AVLNode*, Function&);
 
-	//in-order walk operating on the node
+	//in-order walk operating on the node itself from right to left
+	template<typename Function>
+	void reverseInOrderNode(AVLNode*, Function&);
+
+	//post-order walk operating on the node
 	template<typename Function>
 	void postOrderNode(AVLNode*, Function);
 
@@ -106,10 +112,78 @@ class AVLTree {
 	//recursivly looking for the k-th node
 	T select(AVLNode*, int);
 
+	//returns true is a node is a leaf
+	bool isLeafTree(AVLNode*);
+
+	//building an empty tree with height h
+	AVLNode* buildFullEmptyTree(int h);
+
+	//remove uneccesery leafs
+	void buildAlmostFull(int numOfNodes);
+
+	class LeafRemover {
+		int nodesToRemove;
+	public:
+		LeafRemover(int n) :
+				nodesToRemove(n) {
+		}
+
+		bool operator()(AVLNode* currentRoot) {
+			if (nodesToRemove == 0) {
+				return true;
+			}
+			if(isLeaf(currentRoot->right) && isLeaf(currentRoot->left)){
+				delete (currentRoot->right);
+				currentRoot->right = NULL;
+				nodesToRemove--;
+				if (nodesToRemove == 0) {
+					return true;
+				} else { //if there's more leafs needed to be removed
+					delete (currentRoot->left);
+					currentRoot->left = NULL;
+					nodesToRemove--;
+					return false;
+				}
+			}
+			return true;
+		}
+		bool isLeaf(AVLNode* currentRoot) {
+			return (currentRoot->left == NULL && currentRoot->right == NULL);
+		}
+	};
+
 	class DeleteNode {
 	public:
 		void operator()(AVLNode* node) {
 			delete (node);
+		}
+	};
+
+	class UpdateParent {
+	public:
+		void operator ()(AVLNode* currentRoot) {
+			if (currentRoot->left != NULL) {
+				currentRoot->left->dad = currentRoot;
+			}
+			if (currentRoot->right != NULL) {
+				currentRoot->right->dad = currentRoot;
+			}
+		}
+	};
+
+	class FixWeightAndHeight {
+	public:
+		void operator()(AVLNode*currentRoot) {
+			int lW = currentRoot->left == NULL ? 0 : currentRoot->left->weight,
+					rW = //calc the subtrees weights
+							currentRoot->right == NULL ?
+									0 : currentRoot->right->weight;
+			currentRoot->weight = lW + rW + 1;
+			int lH = currentRoot->left == NULL ? -1 : currentRoot->left->hight,
+					rH = //calc the subtrees heights
+							currentRoot->right == NULL ?
+									-1 : currentRoot->right->hight;
+			currentRoot->hight = 1 + (lH > rH ? lH : rH);
 		}
 	};
 
@@ -123,6 +197,9 @@ public:
 
 	AVLTree operator=(const AVLTree&);
 	~AVLTree();
+
+	//building an empty full tree with numOfNodes nodes
+	void buildEmptyTree(int numOfNodes);
 
 	//inserting a new object to the tree
 	void insert(const T&);
@@ -191,6 +268,14 @@ class AVLTree<T, Compare>::AVLNode {
 	AVLNode(T data) :
 			data(data), left(NULL), right(NULL), dad(NULL), hight(0), weight(1) {
 	}
+	AVLNode() :
+			data(), left(NULL), right(NULL), dad(NULL), hight(0), weight(1) {
+	}
+
+	AVLNode(AVLNode* l, AVLNode* r) :
+			data(), left(l), right(r), dad(NULL), hight(0), weight(1) {
+	}
+
 	AVLNode(const AVLNode&);
 	AVLNode operator=(const AVLNode&);
 };
@@ -198,6 +283,11 @@ class AVLTree<T, Compare>::AVLNode {
 /******************************
  * Functions and Classes Implementation
  ******************************/
+
+template<typename T, class Compare>
+bool AVLTree<T,Compare>::isLeafTree(AVLNode* currentRoot) {
+	return (currentRoot->left == NULL && currentRoot->right == NULL);
+}
 
 template<typename T, class Compare>
 class AVLTree<T, Compare>::CopyTree {
@@ -227,6 +317,33 @@ AVLTree<T, Compare>::~AVLTree() {
  return newTree;
  }
  */
+
+template<typename T, class Compare>
+void AVLTree<T, Compare>::buildEmptyTree(int numOfNodes) {
+	if (numOfNodes == 0) {
+		return;
+	}
+	//cout << "n is: " << numOfNodes << "\nlog base 2 of n: " << log(numOfNodes)/log(2) << "\n";
+	int height = 0, nodes = 1;
+	while (nodes < numOfNodes) {
+		nodes *= 2;
+		height++;
+	}
+	height--;
+	//cout << "numOfNodes: " << numOfNodes << "\nheight is: " << height; //TODO remove print
+	root = buildFullEmptyTree(height);
+	preOrder(root, UpdateParent());
+
+	FixWeightAndHeight WHFixer;
+	postOrderNode(root, WHFixer);
+	treeSize = pow(2.0, height + 1) - 1;
+	//cout << "\ntreeSize: " << treeSize << "\n";	//TODO remove print
+	buildAlmostFull(numOfNodes);
+	treeSize = numOfNodes;
+	postOrderNode(root, WHFixer);
+	setMax(root);
+}
+
 template<typename T, class Compare>
 void AVLTree<T, Compare>::insert(const T& element) {
 
@@ -436,7 +553,7 @@ void AVLTree<T, Compare>::removeSingleChild(
 			}
 		}
 	} else {	//else-current has only a right child (or no children at all)
-		if (currentRoot == root) {	//if current is the rot of the tree
+		if (currentRoot == root) {	//if current is the root of the tree
 			root = currentRoot->right;
 			root->dad = NULL;
 			currentRoot->dad = root;//this is just for the later heights update
@@ -634,19 +751,19 @@ template<typename T, class Compare>
 T AVLTree<T, Compare>::select(AVLTree<T, Compare>::AVLNode* currentRoot,
 		int k) {
 	int leftW = calcWeight(currentRoot->left);
-	if (leftW == k - 1){ //if you're the k-th node
-			//|| (currentRoot->left == NULL && currentRoot->right == NULL)) {
+	if (leftW == k - 1) { //if you're the k-th node
+	//|| (currentRoot->left == NULL && currentRoot->right == NULL)) {
 		return currentRoot->data;
 	}
-	if (leftW > k - 1) {//if the k-th node is in the left subtree
+	if (leftW > k - 1) {			//if the k-th node is in the left subtree
 		return select(currentRoot->left, k);
 	}
 	return select(currentRoot->right, k - leftW - 1);
 }
 
 template<typename T, class Compare>
-int AVLTree<T, Compare>::calcWeight(AVLTree<T, Compare>::AVLNode* currentRoot){
-	if (currentRoot == NULL){
+int AVLTree<T, Compare>::calcWeight(AVLTree<T, Compare>::AVLNode* currentRoot) {
+	if (currentRoot == NULL) {
 		return 0;
 	}
 	return currentRoot->weight;
@@ -793,6 +910,21 @@ void AVLTree<T, Compare>::inOrder(AVLNode* currentRoot, Function &func) {
 
 template<typename T, class Compare>
 template<typename Function>
+void AVLTree<T, Compare>::reverseInOrderNode(AVLNode* currentRoot,
+		Function& func) {
+	if (isLeafTree(currentRoot)) {
+		return;
+	}
+	reverseInOrderNode(currentRoot->right, func);	//take care of right subtree
+
+	//do something on the root and if you get permission' procced to left subtree
+	if (func(currentRoot)){
+		reverseInOrderNode(currentRoot->left, func);//take care of the leftt subtree
+	}
+}
+
+template<typename T, class Compare>
+template<typename Function>
 void AVLTree<T, Compare>::postOrderNode(AVLNode* currentRoot, Function func) {
 	if (currentRoot == NULL) {
 		return;
@@ -806,6 +938,23 @@ template<typename T, class Compare>
 template<typename Function>
 void AVLTree<T, Compare>::inOrder(Function &func) {
 	inOrder(root, func);
+}
+
+template<typename T, class Compare>
+typename AVLTree<T, Compare>::AVLNode* AVLTree<T, Compare>::buildFullEmptyTree(
+		int height) {
+	if (height == 0) {
+		return new AVLNode();
+	}
+	AVLNode* left = buildFullEmptyTree(height - 1);
+	AVLNode* right = buildFullEmptyTree(height - 1);
+	return new AVLNode(left, right);
+}
+
+template<typename T, class Compare>
+void AVLTree<T, Compare>::buildAlmostFull(int numOfNodes) {
+	LeafRemover remover(treeSize - numOfNodes);
+	reverseInOrderNode(root, remover);
 }
 
 #endif /* AVL_TREE_H_ */
