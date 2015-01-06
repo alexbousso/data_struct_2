@@ -55,8 +55,6 @@ public:
 		cityID = ID;
 	}
 
-	// QUESTION: Why when removing this function from the class, it does not
-	// compile?
 	friend std::ostream& operator<<(std::ostream& os, const City& city) {
 		os << "CityID: ";
 		os.width(4);

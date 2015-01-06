@@ -49,8 +49,6 @@ public:
 		return this->ID == ID;
 	}
 
-	// QUESTION: Why when removing this function from the class, it does not
-	// compile?
 	friend std::ostream& operator<<(std::ostream& os, const Citizen& citizen) {
 		os << "ID: ";
 		os.width(4);

@@ -96,14 +96,6 @@ UnionFind<T, Compare>::UnionFind(int size) :
 		ufSize(size), route() {
 	tree = new Node[size];
 
-	// TODO: Remove
-//	if (typeid(T) == typeid(size)) {
-//		//cout << "it's int\n";
-//		for (int i = 0; i < size; i++) {
-//			tree[i].data = i;
-//		}
-//	}
-
 	for (int i = 0; i < size; i++) {
 		tree[i].max = i;
 	}

@@ -14,8 +14,6 @@
 #include <iostream>
 
 /**
- * TODO: Explain in a better way.
- *
  * The HashFunction needs to have a constructor with one argument, witch
  * receives an integer that delimits the spread of the array that contains the
  * data and a function with the following title:
@@ -53,7 +51,10 @@ public:
 	bool find(T data);
 
 	/**
-	 * TODO: Documentation
+	 * Returns a reference to the data contained in the given key.
+	 *
+	 * @param key - The key to retrieve the data from.
+	 * @throws DataDoesNotExist() - If the given data is not in the table.
 	 */
 	T& getData(int key);
 
