@@ -40,7 +40,7 @@ StatusType MoveToCity(void* DS, int citizenID, int city) {
 	} catch (Failure& fail) {
 		return FAILURE;
 	} catch (std::bad_alloc& ba) {
-		return ALLOCATION_ERROR; //TODO finish making sure we check all the bad cases
+		return ALLOCATION_ERROR;
 	}
 	return SUCCESS;
 }

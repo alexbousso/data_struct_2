@@ -330,14 +330,14 @@ void AVLTree<T, Compare>::buildEmptyTree(int numOfNodes) {
 		height++;
 	}
 	height--;
-	//cout << "numOfNodes: " << numOfNodes << "\nheight is: " << height; //TODO remove print
+
 	root = buildFullEmptyTree(height);
 	preOrder(root, UpdateParent());
 
 	FixWeightAndHeight WHFixer;
 	postOrderNode(root, WHFixer);
 	treeSize = pow(2.0, height + 1) - 1;
-	//cout << "\ntreeSize: " << treeSize << "\n";	//TODO remove print
+
 	buildAlmostFull(numOfNodes);
 	treeSize = numOfNodes;
 	postOrderNode(root, WHFixer);

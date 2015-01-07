@@ -219,7 +219,7 @@ static bool testAVLTreeSelect() {
 	return true;
 }
 
-//TODO add tests
+
 static bool testAVLTreeBuildEmptyTree() {
 
 	CompareInt func;

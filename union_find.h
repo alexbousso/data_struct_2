@@ -10,7 +10,7 @@
 
 #include <cassert>
 #include <iostream>
-#include <typeinfo>	//TODO remove this' it's only needed for the tests!!!#include "exceptions.h"#include "list.h"using std::cout;using std::endl;
+#include "exceptions.h"#include "list.h"using std::cout;using std::endl;
 
 template<typename T, typename Compare>
 class UnionFind {
@@ -90,7 +90,7 @@ public:
  * FUNCTIONS IMPLEMENTATION
  **********************************************************/
 
-//TODO remove the part with the int!!!!!
+
 template<typename T, typename Compare>
 UnionFind<T, Compare>::UnionFind(int size) :
 		ufSize(size), route() {
@@ -114,15 +114,14 @@ int UnionFind<T, Compare>::find(int i) {
 	}
 	//int i = index - 1;	//this is the index in the 0-based array!
 	if (tree[i].parent == -1) {	//if you're a root
-		//assert(tree[i].parent == -1);	//it means you don't have a parent
-		//cout << "list size is: " << route.size() << "\n";	//TODO remove!
+
 		if (route.size() > 0) {	//if there's more then 1 node in the search route
 			for (List<int>::Iterator it = route.begin(); it != route.end();
 					++it) { //let all the nodes in the route point to the root as their parent
 				tree[*it].parent = i;
-				//cout << *it << "->" << i << " | "; //TODO remove!
+
 			}
-			//cout << "\n"; //TODO remove!
+
 		}
 		route.reset();
 		assert(route.size() == 0);
@@ -150,7 +149,7 @@ void UnionFind<T, Compare>::printUF() const {
 	}
 }
 
-//TODO fix this!!!
+
 
 template<typename T, typename Compare>
 void UnionFind<T, Compare>::unite(int element1, int element2) {
@@ -164,7 +163,7 @@ void UnionFind<T, Compare>::unite(int element1, int element2) {
 	}
 
 	int root1 = find(element1), root2 = find(element2);
-	if(root1 == root2){ //TODO test this case!
+	if(root1 == root2){
 		throw Failure();
 	}
 	//the groups are valid, so check which is the largest
